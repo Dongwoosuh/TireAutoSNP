@@ -3,7 +3,7 @@ import pandas as pd
 import re
 
 # 폴더 경로 설정
-folder_path = './results/Total_results'
+folder_path = '../results/Total_results'
 
 # 결과를 저장할 리스트
 last_rows = []
