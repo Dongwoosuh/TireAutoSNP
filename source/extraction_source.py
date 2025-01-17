@@ -10,8 +10,9 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 def slip_angle_dist_extraction(odb_name, instance_name):
-    
+    print("...Slip Angle and Distance Extraction...")
     try:
         odb = openOdb(path=odb_name, readOnly=True)
     except OdbError as e:
@@ -138,7 +139,7 @@ def slip_angle_dist_extraction(odb_name, instance_name):
         print("Error: No nodes found with min X in initial frame.")
         
     target_point_e = (node_c_x, node_c_y + 30 , node_c_z)
-    print(target_point_e)
+    # print(target_point_e)
     closest_node_e = find_closest_node(target_point_e, myInstance.nodes, displacement_values_initial)
     if closest_node_e:
         node_e = closest_node_e.label
@@ -167,11 +168,11 @@ def slip_angle_dist_extraction(odb_name, instance_name):
         
 
     ## Print the nodes for verification
-    print("Last frame: Node with min Y (Node A):", node_a)
-    print("Initial frame: Node closest to target point (Node B):", node_b)
-    print("Initial frame: Node with min Y among nodes with min X (Node C):", node_c)
-    print("Last frame of 'rotation' step: Node with min Y (Node D):", node_d)
-    print("node e: ", node_e)
+    # print("Last frame: Node with min Y (Node A): {}".format(node_a))
+    # print("Initial frame: Node closest to target point (Node B): {}".format(node_b))
+    # print("Initial frame: Node with min Y among nodes with min X (Node C): {}".format(node_c))
+    # print("Last frame of 'rotation' step: Node with min Y (Node D): {}".format(node_d))
+    # print("node e: {}\n".format(node_e))
 
 
     # Get the angle difference between noce A, B
@@ -180,19 +181,19 @@ def slip_angle_dist_extraction(odb_name, instance_name):
     angelslist_ec = get_angle_per_frame(odb, step_subrotation, myInstance, node_c, node_e, node_a)
     
     angle_differences = [abs(a[1] - b[1]) for a, b in zip(angleslist_ba, angelslist_ec)]
-    print(angle_differences)
+    # print(angle_differences)
     max_angle_difference = max(angle_differences)
     max_index = angle_differences.index(max_angle_difference)
     
-    print("at frame: ", max_index, "Max angle difference: ", max_angle_difference)
+    print("Max angle difference: {} at frame {}".format(max_angle_difference, max_index))
     
     if len(step_rotation.frames) == 0:
         max_slip_distance = 'No Rotation Step'
         idx = 'No Rotation Step'
     else:
         max_slip_distance, _, idx = get_slip_dist(odb, step_rotation, myInstance, node_d, node_b)
-    
-    print("at frame: ", idx, "Max distance gap: ", max_slip_distance)
+
+    print("Max distance gap: {} at frame {}\n".format(max_slip_distance, idx))
     
     return max_angle_difference, max_slip_distance
 
@@ -416,6 +417,7 @@ def calculate_angle_between_vectors(v1, v2):
 
 
 def contact_area_extraction(odb_name):
+    print("...Contact Area Extraction...")
 # CSV output file
     odb_base_name = os.path.basename(odb_name).replace(".odb", "")
     csv_file_name = os.path.basename(odb_name).replace(".odb", ".csv")
@@ -427,7 +429,7 @@ def contact_area_extraction(odb_name):
         # for odb_name in odb_files:
         
         # Open the ODB file
-        odb = openOdb(path=odb_name)
+        odb = openOdb(path=odb_name, readOnly=True)
         step_names = list(odb.steps.keys())
         # Iterate over steps
         
@@ -459,11 +461,12 @@ def contact_area_extraction(odb_name):
             
 
                 # print("Step: {}, Time: {}, CAREA: {}".format(step_name, time, area))
-    print("Contact Area extraction complete.") 
+    print("Contact Area extraction completed.\n") 
     odb.close()
       
         
 def max_stress_extraction(odb_name, instance_name):
+    print("...Max Stress Extraction...")
     
     odb = openOdb(odb_name)
 
@@ -556,14 +559,13 @@ def max_stress_extraction(odb_name, instance_name):
             max_overall_element = max_element_label
             max_overall_step = step_name
             max_overall_frame = n  
-    print("Max Overall Stress: ", max_overall_stress)
-    odb.close()
-    print("Data extraction and file creation completed.")
-    
+    print("Max Overall Stress: {}\n".format(max_overall_stress))
+    odb.close()    
     return max_overall_stress, max_overall_element, max_overall_step, max_overall_frame
         
 
-def stiffness_extraction(odb_name, instance_name, graph_plot=False):
+def vertical_stiffness_extraction(odb_name, instance_name, graph_plot=False):
+    print("...Vertical Stiffness Extraction...")
     
     time_graph = []
     displacement_graph = []
@@ -579,7 +581,7 @@ def stiffness_extraction(odb_name, instance_name, graph_plot=False):
     node_set = odb.rootAssembly.nodeSets[node_set_name]
     
     assembly_node_label = node_set.nodes[0][0].label
-    print("Node labels: ", assembly_node_label)
+    # print("Node labels: ", assembly_node_label)
     node_name = 'Node ASSEMBLY.{}'.format(assembly_node_label)
 
     try:
@@ -610,16 +612,16 @@ def stiffness_extraction(odb_name, instance_name, graph_plot=False):
             stiffness_graph.append(0)  # 초기값
 
     average_stiffness=force_ori/(displacement_graph[0]-displacement_graph[i]) #최종 강성
-    print("Average_stiffness={}".format(average_stiffness))
+
+    print("Avg Vertical stiffness: {}\n".format(average_stiffness))
     
-    
-    # CSV 파일 작성 및 저장
-    csv_filename = 'force_displacement_stiffness_results.csv'
-    with open(csv_filename, mode='w') as csvfile:
-        csvwriter = csv.writer(csvfile)
-        csvwriter.writerow(['Time', 'Displacement U2', 'Force (N)', 'Stiffness (N/mm)'])
-        for time, displacement, force, stiffness in zip(time_graph, displacement_graph, force_graph, stiffness_graph):
-            csvwriter.writerow([time, displacement, force, stiffness])
+    # # CSV 파일 작성 및 저장
+    # csv_filename = 'force_displacement_stiffness_results.csv'
+    # with open(csv_filename, mode='w') as csvfile:
+    #     csvwriter = csv.writer(csvfile)
+    #     csvwriter.writerow(['Time', 'Displacement U2', 'Force (N)', 'Stiffness (N/mm)'])
+    #     for time, displacement, force, stiffness in zip(time_graph, displacement_graph, force_graph, stiffness_graph):
+    #         csvwriter.writerow([time, displacement, force, stiffness])
 
     if graph_plot == True:
         
@@ -647,3 +649,72 @@ def stiffness_extraction(odb_name, instance_name, graph_plot=False):
         plt.savefig('Time-Stiffness Curve.png')
         plt.show()
     return average_stiffness
+
+
+def bending_moment_extraction(odb_name):
+    print("...Bending Moment Extraction...")
+    odb = openOdb(path=odb_name, readOnly=True)
+    
+    step = odb.steps['bending']
+    node_set_name = 'L1'
+    node_set = odb.rootAssembly.nodeSets[node_set_name]
+    assembly_node_label = node_set.nodes[0][0].label
+    # print("Node labels: ", assembly_node_label)
+    node_name = 'Node ASSEMBLY.{}'.format(assembly_node_label)
+    
+    try:
+        history_region = step.historyRegions[node_name]  # Node PartName.nodenum
+    except KeyError:
+        print("History region 'Node ASSEMBLY.2' not found in odb file: {}".format(odb_name))
+        
+    L1_RM3 = history_region.historyOutputs['RM3'].data
+    bending_moment = L1_RM3[-1][-1]
+    bending_moment = abs(bending_moment)*2
+    print("Bending Moment: {}\n".format(bending_moment))
+    return bending_moment
+
+
+def torque_extraction(odb_name):
+    print("...Torque Extraction...")
+    odb = openOdb(path=odb_name, readOnly=True)
+    step = odb.steps['subrotation']
+    
+    element_set_name = 'WIRE-2-SET-1'
+    element_set = odb.rootAssembly.elementSets[element_set_name]
+    assembly_element_label = element_set.elements[0][0].label
+    element_name = 'Element ASSEMBLY.{}'.format(assembly_element_label)
+    
+    try:
+        history_region = step.historyRegions[element_name]  # Node PartName.nodenum
+    except KeyError:
+        print("History region 'Element ASSEMBLY.2' not found in odb file: {}".format(odb_name))    
+        
+    CTM1 = history_region.historyOutputs['CTM1'].data
+    CTM2 = history_region.historyOutputs['CTM2'].data
+    torque_x = np.array(CTM1)
+    torque_y = np.array(CTM2)
+
+    time = torque_x[:,0]
+    torque_magnitude = np.sqrt(torque_x[:,1]**2 + torque_y[:,1]**2)
+    torque = np.column_stack((time, torque_magnitude))
+    
+    torque_last_frame = torque[-1,1]
+    print("Torque at last frame: {}".format(torque_last_frame))
+
+    max_torque = np.max(torque_magnitude)
+    print("Max Torque: {}\n".format(max_torque))
+
+    odb_base_name = os.path.basename(odb_name).replace(".odb", "")
+    csv_file_name = os.path.basename(odb_name).replace(".odb", ".csv")
+    results_dir = os.path.join('results', 'Torque')
+    if not os.path.exists(results_dir):
+        os.makedirs(results_dir)
+    csv_path_name = os.path.join(results_dir, csv_file_name)
+
+    headers = ["Time", "Torque"]
+    with open(csv_path_name, 'wb') as file:
+        writer = csv.writer(file)
+        writer.writerow(headers)
+        writer.writerows(torque)
+
+    return torque_last_frame, max_torque
