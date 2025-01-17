@@ -162,17 +162,14 @@ def slip_angle_dist_extraction(odb_name, instance_name):
 
     if min_y_node_D:
         node_d = min_y_node_D.label
-        # node_d_x = min_y_node_D.coordinates[0] + displacement_values_last_subrotation[node_d].data[0]
-        # node_d_y = min_y_node_D.coordinates[1] + displacement_values_last_subrotation[node_d].data[1]
-        # node_d_z = min_y_node_D.coordinates[2] + displacement_values_last_subrotation[node_d].data[2]
-        
+
 
     ## Print the nodes for verification
-    # print("Last frame: Node with min Y (Node A): {}".format(node_a))
-    # print("Initial frame: Node closest to target point (Node B): {}".format(node_b))
-    # print("Initial frame: Node with min Y among nodes with min X (Node C): {}".format(node_c))
-    # print("Last frame of 'rotation' step: Node with min Y (Node D): {}".format(node_d))
-    # print("node e: {}\n".format(node_e))
+    print("Last frame: Node with min Y (Node A): {}".format(node_a))
+    print("Initial frame: Node closest to target point (Node B): {}".format(node_b))
+    print("Initial frame: Node with min Y among nodes with min X (Node C): {}".format(node_c))
+    print("Last frame of 'rotation' step: Node with min Y (Node D): {}".format(node_d))
+    print("node e: {}\n".format(node_e))
 
 
     # Get the angle difference between noce A, B
@@ -183,19 +180,20 @@ def slip_angle_dist_extraction(odb_name, instance_name):
     angle_differences = [abs(a[1] - b[1]) for a, b in zip(angleslist_ba, angelslist_ec)]
     # print(angle_differences)
     max_angle_difference = max(angle_differences)
-    max_index = angle_differences.index(max_angle_difference)
+    max_angle_index = angle_differences.index(max_angle_difference)
     
-    print("Max angle difference: {} at frame {}".format(max_angle_difference, max_index))
+    print("Max angle difference: {} at frame {}".format(max_angle_difference, max_angle_index))
     
     if len(step_rotation.frames) == 0:
         max_slip_distance = 'No Rotation Step'
         idx = 'No Rotation Step'
     else:
-        max_slip_distance, _, idx = get_slip_dist(odb, step_rotation, myInstance, node_d, node_b)
+        max_slip_distance, _, max_dist_idx = get_slip_dist(odb, step_rotation, myInstance, node_d, node_b)
 
-    print("Max distance gap: {} at frame {}\n".format(max_slip_distance, idx))
+    print("Max distance gap: {} at frame {}\n".format(max_slip_distance, max_dist_idx))
     
-    return max_angle_difference, max_slip_distance
+    target_step_frame = [['subrotation', max_angle_index], ['rotation', max_dist_idx]]
+    return max_angle_difference, max_slip_distance, target_step_frame
 
 def get_slip_dist(odb, step, myInstance, node_1, node_2):
     """Calculate the slip distance between two nodes in 3D space in ROTATION Step."""
@@ -465,11 +463,33 @@ def contact_area_extraction(odb_name):
     odb.close()
       
         
-def max_stress_extraction(odb_name, instance_name):
+def max_stress_extraction(odb_name, instance_name, new_target_step_frame_list):
     print("...Max Stress Extraction...")
     
     odb = openOdb(odb_name)
+    
+    try:
+        step_bending = odb.steps['bending']
+    except KeyError:
+        print("Error: No bending")
+        odb.close()
+        exit()
 
+    len_bending_frames = len(step_bending.frames)
+    try:
+        step_loading = odb.steps['loading_300N']
+    except KeyError:
+        print("Error: No bending")
+        odb.close()
+        exit()
+
+    len_loading_frames = len(step_loading.frames)
+    
+    target_step_frame = [['bending', len_bending_frames-1 ], ['loading_300N', len_loading_frames-1]]
+    
+    for new_target_step_frame in new_target_step_frame_list:
+        target_step_frame.append(new_target_step_frame)
+        
     # Change variables
     # 1. Change odb_name
     # 2. Change instance_name
@@ -485,61 +505,26 @@ def max_stress_extraction(odb_name, instance_name):
     max_overall_step = None             #
     max_overall_frame = None            #
     
-    lastframe_steps = ['bending', 'loading', 'loading_300N']
+    
+    # CSV output file
+    odb_base_name = os.path.basename(odb_name).replace(".odb", "")
+    csv_file_name = os.path.basename(odb_name).replace(".odb", ".csv")
+    csv_path_name = os.path.join('results','Stress', csv_file_name)
+    
+    with open(csv_path_name, 'w') as csvfile:
+        csvwriter = csv.writer(csvfile, lineterminator='\n')
+        csvwriter.writerow(['Step', 'Frame', 'ElementLabel', 'Stress'])
 
-    for step_name in lastframe_steps:
-        step = odb.steps[step_name]
-        n = len(step.frames)
-
-        # for loop through every frame and an instance             
-        stress_field = step.frames[-1].fieldOutputs['S'].getSubset(position = INTEGRATION_POINT, region = odb.rootAssembly.instances[instance_name])
-        stress_value = stress_field.values      
-
-        # Find max stress and the element number     
-        max_stress_value = -float("inf")
-        max_element_label = None
-
-        for stress in stress_value:
-            try:
-                S11, S22, S33 = stress.data[0], stress.data[1], stress.data[2]
-            except OdbError:
-                S11, S22, S33 = stress.dataDouble[0], stress.dataDouble[1], stress.dataDouble[2]
-                
-            traceS = S11 + S22 + S33
-
-            if traceS >= 0:
-                if stress.mises > max_stress_value:
-                    max_stress_value = stress.mises
-                    max_element_label = stress.elementLabel
-
-        results.append([odb_name, step_name, n, instance_name, max_element_label, "{:.6f}".format(max_stress_value)])
-        
-        if max_stress_value > max_overall_stress:
-            max_overall_stress = max_stress_value
-            max_overall_element = max_element_label
-            max_overall_step = step_name
-            max_overall_frame = n  
-                  
-    # for loop through each step(exclude the previous steps)
-    excluded_steps = {"bending", "loading"}
-    for step_name in odb.steps.keys():
-        if step_name in excluded_steps:
-            continue
-        step = odb.steps[step_name]
-        n = len(step.frames)
-
-        # for loop through every frame          
-        for i in range(n):
-            stress_field = step.frames[i].fieldOutputs['S'].getSubset(position = INTEGRATION_POINT, region = odb.rootAssembly.instances[instance_name])
-            # stress_field = step.frames[i].fieldOutputs['S'].getSubset(position = ELEMENT_NODAL, region = odb.rootAssembly.instances[instance_name])
-            stress_value = stress_field.values      
-
-            # Find max stress and the element number           
+        for step_name, frame_num in target_step_frame:
+            step = odb.steps[step_name]
+            
+            stress_field = step.frames[frame_num].fieldOutputs['S'].getSubset(position = INTEGRATION_POINT, region = odb.rootAssembly.instances[instance_name])
+            stress_value = stress_field.values
+            
             max_stress_value = -float("inf")
             max_element_label = None
-
+            
             for stress in stress_value:
-                
                 try:
                     S11, S22, S33 = stress.data[0], stress.data[1], stress.data[2]
                 except OdbError:
@@ -551,14 +536,15 @@ def max_stress_extraction(odb_name, instance_name):
                     if stress.mises > max_stress_value:
                         max_stress_value = stress.mises
                         max_element_label = stress.elementLabel
-        
-        results.append([odb_name, step_name, n, instance_name, max_element_label, "{:.6f}".format(max_stress_value)])
-        
-        if max_stress_value > max_overall_stress:
-            max_overall_stress = max_stress_value
-            max_overall_element = max_element_label
-            max_overall_step = step_name
-            max_overall_frame = n  
+                        
+            csvwriter.writerow([step_name, frame_num, max_element_label, max_stress_value])
+                
+            if max_stress_value > max_overall_stress:
+                max_overall_stress = max_stress_value
+                max_overall_element = max_element_label
+                max_overall_step = step_name
+                max_overall_frame = frame_num
+            
     print("Max Overall Stress: {}\n".format(max_overall_stress))
     odb.close()    
     return max_overall_stress, max_overall_element, max_overall_step, max_overall_frame

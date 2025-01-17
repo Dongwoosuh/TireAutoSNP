@@ -1,13 +1,15 @@
-from source.extraction_source import *
+from extraction_source import *
 import os
 import pdb
 
 
 odb_folder_path = './omniwheel_ref'
-odb_files = [
-    os.path.join(odb_folder_path, file)
-    for file in os.listdir(odb_folder_path)
-    if file.endswith(".odb") and os.path.isfile(os.path.join(odb_folder_path, file))]
+# odb_files = [
+#     os.path.join(odb_folder_path, file)
+#     for file in os.listdir(odb_folder_path)
+#     if file.endswith(".odb") and os.path.isfile(os.path.join(odb_folder_path, file))]
+
+odb_files = [os.path.join(odb_folder_path, 'Run39.odb')]
 
 instance_name = 'TIRE-1'
 
@@ -23,13 +25,14 @@ for odb_name in odb_files:
     print("\n====================== Extracting data from {} ===========================".format(odb_name))
     
     vertical_stiffness = vertical_stiffness_extraction(odb_name, instance_name)
-    max_slip_angle, max_slip_distance = slip_angle_dist_extraction(odb_name, instance_name)
+    max_slip_angle, max_slip_distance, target_step_frame_list = slip_angle_dist_extraction(odb_name, instance_name)
     bending_moment = bending_moment_extraction(odb_name)
     torque_last_frame, max_torque = torque_extraction(odb_name)
     contact_area_extraction(odb_name)
     
-    max_overall_stress, max_overall_element, max_overall_step, max_overall_frame =max_stress_extraction(odb_name, instance_name)
-
+    max_overall_stress, max_overall_element, max_overall_step, max_overall_frame = max_stress_extraction(odb_name, instance_name, target_step_frame_list)
+    print("max_overall_step: ", max_overall_step)
+    print("max_overall_frame: ", max_overall_frame) 
 
     odb_base_name = os.path.basename(odb_name).replace(".odb", "")
     odb_name_list.append(odb_base_name)
