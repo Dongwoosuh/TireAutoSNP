@@ -582,7 +582,7 @@ def vertical_stiffness_extraction(odb_name, instance_name, graph_plot=False):
         displacement_graph.append(displacement)
     odb.close()
 
-    force_ori = 200
+    force_ori = 150
     # Force and Stiffness Calculation
     for i in range(len(time_graph)):
         time = time_graph[i]
