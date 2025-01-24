@@ -1,15 +1,16 @@
-from extraction_source import *
+from source import *
 import os
+import csv
 import pdb
 
 
 odb_folder_path = './omniwheel_ref'
-# odb_files = [
-#     os.path.join(odb_folder_path, file)
-#     for file in os.listdir(odb_folder_path)
-#     if file.endswith(".odb") and os.path.isfile(os.path.join(odb_folder_path, file))]
+odb_files = [
+    os.path.join(odb_folder_path, file)
+    for file in os.listdir(odb_folder_path)
+    if file.endswith(".odb") and os.path.isfile(os.path.join(odb_folder_path, file))]
 
-odb_files = [os.path.join(odb_folder_path, 'Run39.odb')]
+# odb_files = [os.path.join(odb_folder_path, 'Run15.odb')]
 
 instance_name = 'TIRE-1'
 
