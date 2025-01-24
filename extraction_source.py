@@ -178,7 +178,7 @@ def slip_angle_dist_extraction(odb_name, instance_name):
     angelslist_ec = get_angle_per_frame(odb, step_subrotation, myInstance, node_c, node_e, node_a)
     
     angle_differences = [abs(a[1] - b[1]) for a, b in zip(angleslist_ba, angelslist_ec)]
-    # print(angle_differences)
+    print(angle_differences)
     max_angle_difference = max(angle_differences)
     max_angle_index = angle_differences.index(max_angle_difference)
     
@@ -291,7 +291,7 @@ def get_slip_dist(odb, step, myInstance, node_1, node_2):
         current_vector_ba = [current_node_1[i] - center2_current_coords[i] for i in range(3)]
         current_vector_ca = [current_node_2[i] - center2_current_coords[i] for i in range(3)]
         
-        if current_node_1[1] > -79.0:
+        if current_node_1[1] > -77.0:
             contact_status = False
         else: 
             contact_status = True
