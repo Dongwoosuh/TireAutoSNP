@@ -93,19 +93,9 @@ def slip_angle_dist_extraction(odb_name, instance_name):
     
     # the node closest to the target point in the initial frame (Node B)
     close_nodes_b, close_nodes_b_coords = find_nodes_within_tolerance(target_point, myInstance.nodes, displacement_values_initial)
-    # pdb.set_trace()
 
     node_b_coords = calculate_midpoint_by_nodes(close_nodes_b_coords)
-    #     node_b = close_nodes[0].label
-    #     node_b = closest_node.label
-    #     node_b_info = closest_node
-        # node_b_x = closest_node.coordinates[0] + displacement_values_initial[node_b].data[0]
-        # node_b_y = closest_node.coordinates[1] + displacement_values_initial[node_b].data[1]
-        # node_b_z = closest_node.coordinates[2] + displacement_values_initial[node_b].data[2]
 
-    
-    # else:
-    #     print("Error: Could not find a node closest to the target point in initial frame.")
 
     # the node with the minimum Y coordinate among the nodes with the minimum X coordinate in the initial frame (Node C)
     min_x_nodes = find_nodes_with_min_x(myInstance.nodes, displacement_values_initial)
@@ -135,14 +125,8 @@ def slip_angle_dist_extraction(odb_name, instance_name):
     target_point_e = (0, 0 , 0)
     # print(target_point_e)
     close_nodes_e, close_nodes_e_coords = find_nodes_within_tolerance(target_point_e, myInstance.nodes, displacement_values_initial)
-    node_e_coords = calculate_midpoint_by_nodes(close_nodes_e_coords)
-    # if close_nodes_e:
-    #     node_e_coords = calculate_midpoint_by_nodes(close_nodes_e)
-        
-    # else:
-    #     print("Error: Could not find a node closest to the target point in initial frame.")
+    node_e_coords = calculate_midpoint_by_nodes(close_nodes_e_coords) 
 
-    # Get the last frame of the 'rotation' step
     last_frame_subrotation = step_subrotation.frames[-1]
 
     # Get the displacement field output for the specific instance
@@ -202,12 +186,7 @@ def get_slip_dist(odb, step, myInstance, node_1, node_2):
     first_displacement_values = {value.nodeLabel: value for value in first_displacement_field.values}
 
     node_1_initial_disp = first_displacement_values.get(node_1)
-    # node_2_initial_disp = first_displacement_values.get(node_2)
-    # if node_1_initial_disp is None or node_2_initial_disp is None:
-    #     print("Error: Initial displacement not found for Node A or Node C in subrotation step.")
-    #     odb.close()
-    #     sys.exit()
-        
+
     # Get initial displacement for center2 node
     first_displacement_field_center2 = first_frame.fieldOutputs['U'].getSubset(region=center2)
     
@@ -323,13 +302,7 @@ def get_angle_per_frame(odb, step, myInstance, node_1, node_2, contact_node):
         
     initial_node_1 = [myInstance.nodes[node_1 - 1].coordinates[i] + initial_node_1_disp[i] for i in range(3)]
     
-    # try: 
-    #     initial_node_2_disp = node_2_initial_disp.data
-    # except OdbError:
-    #     initial_node_2_disp = node_2_initial_disp.dataDouble
-        
-    # initial_node_2 = [myInstance.nodes[node_2 - 1].coordinates[i] + initial_node_2_disp[i] for i in range(3)]
-    
+    pdb.set_trace()
     initial_node_2  = calculate_center_of_nodes(myInstance, node_2, first_displacement_field)
 
     initial_vector_ba = [initial_node_1[i] - initial_node_2[i] for i in range(3)]   
