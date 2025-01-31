@@ -23,14 +23,14 @@ for file_name in os.listdir(folder_path):
             print(f"Error reading {file_name}: {e}")
 
 # 새 헤더 정의
-columns = ["ODB Name", "Max Avg Stress", "Vertical Stiffness", "Max Slip Angle", "Max Slip Distance", "Bending Moment", "Torque"]
+columns = ["ODB Name", "Max Avg Stress", "Vertical Stiffness", "Max Slip Angle", "Max Slip Distance", "Bending Moment", "Torque", "Center Disp Gap(subrot)", "Center Disp Gap(rot)"]
 
 # 마지막 행들을 데이터프레임으로 변환
 result_df = pd.DataFrame(last_rows, columns=columns)
 
 # 결과를 Total_results.csv로 저장
 save_path = './results'
-output_path = os.path.join(save_path, 'Total_results.csv')
+output_path = os.path.join(save_path, 'Total_results_new.csv')
 result_df.to_csv(output_path, index=False)
 
 print(f"Total results saved to {output_path}")

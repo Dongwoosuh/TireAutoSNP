@@ -33,15 +33,28 @@ def tire_center_displacement_extraction(odb_name):
     displacement_history_U_subrotation = history_region_subrotation.historyOutputs['U2'].data  
     displacement_history_U_rotation = history_region_rotation.historyOutputs['U2'].data 
     
-    time_graph = [] 
-    displacement_graph = []
-    for time, displacement in displacement_history_U_subrotation:
-        time_graph.append(time)
-        displacement_graph.append(displacement)
+    time_graph_subrot = [] 
+    displacement_graph_subrot = []
+    for time_subrot, displacement_subrot in displacement_history_U_subrotation:
+        time_graph_subrot.append(time_subrot)
+        displacement_graph_subrot.append(displacement_subrot)
         
-    for time, displacement in displacement_history_U_rotation:
-        time_graph.append(time)
-        displacement_graph.append(displacement)
-        pdb.set_trace()
+    time_graph_rot =[]
+    displacement_graph_rot = []
+    for time_rot, displacement_rot in displacement_history_U_rotation:
         
+        if time_rot > 0.0762:
+            break
+        time_graph_rot.append(time_rot)
+        displacement_graph_rot.append(displacement_rot)
+        # pdb.set_trace()
+    max_disp_subrot = max(displacement_graph_subrot)
+    min_disp_subrot = min(displacement_graph_subrot)
+    subrot_gap = abs(max_disp_subrot - min_disp_subrot)
+    
+    max_disp_rot = max(displacement_graph_rot)
+    min_disp_rot = min(displacement_graph_rot)
+    rot_gap = abs(max_disp_rot - min_disp_rot)
+    
+    return subrot_gap, rot_gap
     

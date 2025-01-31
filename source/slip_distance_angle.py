@@ -302,7 +302,7 @@ def get_angle_per_frame(odb, step, myInstance, node_1, node_2, contact_node):
         
     initial_node_1 = [myInstance.nodes[node_1 - 1].coordinates[i] + initial_node_1_disp[i] for i in range(3)]
     
-    pdb.set_trace()
+    # pdb.set_trace()
     initial_node_2  = calculate_center_of_nodes(myInstance, node_2, first_displacement_field)
 
     initial_vector_ba = [initial_node_1[i] - initial_node_2[i] for i in range(3)]   
