@@ -343,10 +343,9 @@ def get_angle_per_frame(odb, step, myInstance, node_1, node_2, contact_node):
         current_contact_node = [myInstance.nodes[contact_node - 1].coordinates[i] + current_contact_node_disp[i] for i in range(3)]
 
         current_vector_ba = [current_node_1[i] - current_node_2[i] for i in range(3)]
-
         
         ## Calculate the frame where the contact stopped, that is why we need "contact_node"
-        if current_contact_node[1] > -79.98:
+        if current_contact_node[1] > -79.9:
             contact_status = False
             stop_frame = frame
         else: 
