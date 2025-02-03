@@ -1,8 +1,8 @@
 import pandas as pd
 
 # 파일 경로 설정
-total_results_path = './results/Total_results_new_all.csv'
-doe_results_path = './postprocessing/result/DOE_results_0120_Final3.csv'
+total_results_path = './results/Updated_Total_results_250203.csv'
+doe_results_path = './postprocessing/result/Total_0203.csv'
 
 # 파일 읽기
 total_results = pd.read_csv(total_results_path)
@@ -12,7 +12,7 @@ doe_results = pd.read_csv(doe_results_path)
 total_results_runs = total_results.iloc[:, 0].unique()
 
 # DOE_results에서 첫 번째 열의 값이 Total_results의 값과 일치하는 행만 필터링
-filtered_doe_results = doe_results[doe_results.iloc[:, 0].isin(total_results_runs)]
+filtered_doe_results = doe_results[doe_results.iloc[:, -1].isin(total_results_runs)]
 
 # 결과 저장
 filtered_doe_results_path = './postprocessing/result/DOE_results.csv'

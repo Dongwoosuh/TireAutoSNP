@@ -6,11 +6,16 @@ from scipy.stats import zscore
 import re
 
 # 분석할 모든 CSV 파일 찾기 (현재 디렉터리에서)
-directory_path = "./"  # 현재 디렉터리
+directory_path = "./results/Stress_all"  # 현재 디렉터리
 
 # 파일명에서 숫자 추출 후 정렬
-csv_files = sorted([f for f in os.listdir(directory_path) if re.match(r"Run\d+\.csv", f)],
-                    key=lambda x: int(re.search(r"\d+", x).group()))
+# csv_files = sorted([f for f in os.listdir(directory_path) if re.match(r"Run\d+\.csv", f)],
+#                     key=lambda x: int(re.search(r"\d+", x).group()))
+
+csv_files = sorted(
+    [f for f in os.listdir(directory_path) if f.endswith(".csv")],
+    key=lambda x: (not x.startswith("Add_Run"), int(re.search(r"\d+", x).group()))
+)
 
 # Z-Score 임계값 설정
 threshold_z = 10
@@ -21,7 +26,7 @@ results = []
 # 각 CSV 파일에 대해 분석 진행
 for file_name in csv_files:
     file_path = os.path.join(directory_path, file_name)
-    
+    base_file_name = os.path.splitext(file_name)[0]
     print(f"\n Processing file: {file_name}")
 
     df = pd.read_csv(file_path, header=0)
@@ -54,7 +59,7 @@ for file_name in csv_files:
     # 이상치 제거 후 최대 Stress 찾기
     max_stress = filtered_df.iloc[:, 1:].max().max()
     # 결과 저장
-    results.append([file_name, max_stress])
+    results.append([base_file_name, max_stress])
 
     # 결과 출력
     print("Filtered Max Stress:", max_stress)
@@ -72,5 +77,5 @@ for file_name in csv_files:
 # 결과를 DataFrame으로 변환 후 CSV 저장
 results_df = pd.DataFrame(results, columns=["File Name", "Max Stress After Outlier Removal"])
 output_filename = "Max_Stress_After_Outlier_Removal.csv"
-results_df.to_csv(output_filename, index=False)
+results_df.to_csv(os.path.join('results', output_filename), index=False)
 print("\n All CSV files have been processed successfully!")
