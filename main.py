@@ -70,11 +70,10 @@ for odb_name in odb_files:
 Total_results_file = os.path.join('results', 'Total_results.csv')
 with open(Total_results_file, "wb") as csvfile:
     writer = csv.writer(csvfile)
-    writer.writerow(["ODB Name", "Max Overall Stress", "Vertical Stiffness", "Max Slip Angle", "Max Slip Distance", "Bending Moment", "Torque", "Center Disp Gap(subrot)", "Center Disp Gap(rot)"])
+    writer.writerow(["ODB Name", "Vertical Stiffness", "Max Slip Angle", "Max Slip Distance", "Bending Moment", "Torque", "Center Disp Gap(subrot)", "Center Disp Gap(rot)"])
     for i in range(len(odb_name_list)):
         writer.writerow([
             odb_name_list[i],
-            max_overall_stress_list[i],
             vertical_stiffness_list[i],
             max_slip_angle_list[i],
             max_slip_distance_list[i],
