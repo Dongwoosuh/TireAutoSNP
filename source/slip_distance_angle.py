@@ -9,7 +9,7 @@ from find_nearest_p import *
 
 __all__ = ['slip_angle_dist_extraction']    
 
-def slip_angle_dist_extraction(odb_name, instance_name):
+def     slip_angle_dist_extraction(odb_name, instance_name):
     print("...Slip Angle and Distance Extraction...")
     try:
         odb = openOdb(path=odb_name, readOnly=True)
@@ -136,7 +136,7 @@ def slip_angle_dist_extraction(odb_name, instance_name):
     displacement_values_last_subrotation = {value.nodeLabel: value for value in displacement_field_last_subrotation.values}
     # Now, proceed with finding the node with minimum Y coordinate
     # min_y_node_D = find_node_with_min_y(myInstance.nodes, displacement_values_last_subrotation)
-    min_y_node_D = find_closest_node_to_target(myInstance.nodes, node_b_coords , displacement_values_last_subrotation)
+    min_y_node_D = find_closest_node_to_target(myInstance.nodes , displacement_values_last_subrotation)
 
     if min_y_node_D:
         node_d = min_y_node_D.label
@@ -152,14 +152,19 @@ def slip_angle_dist_extraction(odb_name, instance_name):
 
     # Get the angle difference between noce A, B
     angleslist_ba = get_angle_per_frame(odb, step_subrotation, myInstance, node_a, close_nodes_b, contact_node=node_a)
-    print(angleslist_ba)
     # Get the angle difference between noce C, E
     angleslist_ec = get_angle_per_frame(odb, step_subrotation, myInstance, node_c, close_nodes_e, contact_node=node_a)
-    print(angleslist_ec)
     
     angle_differences = [abs(a[1] - b[1]) for a, b in zip(angleslist_ba, angleslist_ec)]
+    
     print(angle_differences)
-    max_angle_difference = max(angle_differences)
+    max_angle_difference = angle_differences[0]
+    
+    for i in range(1, len(angle_differences)): 
+        if angle_differences[i] > max_angle_difference:
+            max_angle_difference = angle_differences[i]
+        else:
+            break            
     max_angle_index = angle_differences.index(max_angle_difference)
     
     print("Max angle difference: {} at frame {}".format(max_angle_difference, max_angle_index))
@@ -341,7 +346,7 @@ def get_angle_per_frame(odb, step, myInstance, node_1, node_2, contact_node):
 
         
         ## Calculate the frame where the contact stopped, that is why we need "contact_node"
-        if current_contact_node[1] > -79:
+        if current_contact_node[1] > -79.98:
             contact_status = False
             stop_frame = frame
         else: 

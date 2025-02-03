@@ -210,18 +210,14 @@ def find_node_with_min_y_among(nodes, displacement_values):
 
 
 
-def find_closest_node_to_target(nodes, target_coordinates, displacement_values):
-    closest_node = None
-    min_distance = float('inf')
-
-    
-
+def find_closest_node_to_target(nodes, displacement_values):
+    valid_nodes = []
     
     for node in nodes:
         disp = displacement_values.get(node.label)
         if disp is None:
             continue
-
+        
         try:
             node_coordinates = [
                 node.coordinates[0] + disp.data[0],
@@ -235,12 +231,23 @@ def find_closest_node_to_target(nodes, target_coordinates, displacement_values):
                 node.coordinates[2] + disp.dataDouble[2],
             ]
         
-        if node_coordinates[0] > 90 and node_coordinates[1] < -79.9 : 
-            
-            distance = np.linalg.norm(np.array(node_coordinates) - np.array(target_coordinates))
+        if node_coordinates[0] > 90 and node_coordinates[1] < -79.9:
+            valid_nodes.append((node, node_coordinates))
 
-            if distance < min_distance:
-                min_distance = distance
-                closest_node = node
+    if not valid_nodes:
+        return None
 
-    return closest_node
+
+    mean_coordinates = np.mean([coords for _, coords in valid_nodes], axis=0)
+
+
+    closest_node = None
+    min_distance = float('inf')
+
+    for node, node_coordinates in valid_nodes:
+        distance = np.linalg.norm(np.array(node_coordinates) - np.array(mean_coordinates))
+        if distance < min_distance:
+            min_distance = distance
+            closest_node = node  
+
+    return closest_node  

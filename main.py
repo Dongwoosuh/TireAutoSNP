@@ -10,7 +10,7 @@ odb_files = [
     for file in os.listdir(odb_folder_path)
     if file.endswith(".odb") and os.path.isfile(os.path.join(odb_folder_path, file))]
 
-# odb_files = [os.path.join(odb_folder_path, 'Run15.odb')]
+odb_files = [os.path.join(odb_folder_path, 'Run15.odb')]
 
 instance_name = 'TIRE-1'
 
@@ -26,8 +26,8 @@ rot_center_disp_gap_list = []
 for odb_name in odb_files:
     print("\n====================== Extracting data from {} ===========================".format(odb_name))
     
-    subrot_center_disp_gap, rot_center_disp_gap  = tire_center_displacement_extraction(odb_name)
-    vertical_stiffness = vertical_stiffness_extraction(odb_name, instance_name)
+    # subrot_center_disp_gap, rot_center_disp_gap  = tire_center_displacement_extraction(odb_name)
+    # vertical_stiffness = vertical_stiffness_extraction(odb_name, instance_name)
     max_slip_angle, max_slip_distance, target_step_frame_list = slip_angle_dist_extraction(odb_name, instance_name)
     bending_moment = bending_moment_extraction(odb_name)
     torque_last_frame, max_torque = torque_extraction(odb_name)
