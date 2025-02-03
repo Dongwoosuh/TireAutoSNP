@@ -1,3 +1,5 @@
 *.odb
 *.pyc
 *.sta
+omniwheel_ref/
+results/
