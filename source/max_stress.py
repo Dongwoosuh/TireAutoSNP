@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*- 
 import os
 import csv
-
+import pdb
 from odbAccess import *
 
 __all__ = ['max_stress_extraction']
@@ -52,42 +52,62 @@ def max_stress_extraction(odb_name, instance_name, new_target_step_frame_list):
     # CSV output file
     odb_base_name = os.path.basename(odb_name).replace(".odb", "")
     csv_file_name = os.path.basename(odb_name).replace(".odb", ".csv")
-    csv_path_name = os.path.join('results','Stress', csv_file_name)
+    csv_path_name = os.path.join('results','Stress_all', csv_file_name)
     
-    with open(csv_path_name, 'w') as csvfile:
-        csvwriter = csv.writer(csvfile, lineterminator='\n')
-        csvwriter.writerow(['Step', 'Frame', 'ElementLabel', 'Stress'])
+    steps_data = {}
+    all_elements_label = set()
 
-        for step_name, frame_num in target_step_frame:
-            step = odb.steps[step_name]
-            
-            stress_field = step.frames[frame_num].fieldOutputs['S'].getSubset(position = INTEGRATION_POINT, region = odb.rootAssembly.instances[instance_name])
-            stress_value = stress_field.values
-            
-            max_stress_value = -float("inf")
-            max_element_label = None
-            
-            for stress in stress_value:
-                try:
-                    S11, S22, S33 = stress.data[0], stress.data[1], stress.data[2]
-                except OdbError:
-                    S11, S22, S33 = stress.dataDouble[0], stress.dataDouble[1], stress.dataDouble[2]
-                    
-                traceS = S11 + S22 + S33
-
-                if traceS >= 0:
-                    if stress.mises > max_stress_value:
-                        max_stress_value = stress.mises
-                        max_element_label = stress.elementLabel
-                        
-            csvwriter.writerow([step_name, frame_num, max_element_label, max_stress_value])
+    for step_name, frame_num in target_step_frame:
+        step = odb.steps[step_name]
+        
+        stress_field = step.frames[frame_num].fieldOutputs['S'].getSubset(position = INTEGRATION_POINT, region = odb.rootAssembly.instances[instance_name])
+        stress_value = stress_field.values
+        
+        max_stress_value = -float("inf")
+        max_element_label = None
+        
+        step_key = (step_name, frame_num)
+        steps_data[step_key] = {}
+        
+        for stress in stress_value:
+            try:
+                S11, S22, S33 = stress.data[0], stress.data[1], stress.data[2]
+            except OdbError:
+                S11, S22, S33 = stress.dataDouble[0], stress.dataDouble[1], stress.dataDouble[2]
                 
-            if max_stress_value > max_overall_stress:
-                max_overall_stress = max_stress_value
-                max_overall_element = max_element_label
-                max_overall_step = step_name
-                max_overall_frame = frame_num
+            traceS = S11 + S22 + S33
+
+            steps_data[step_key][stress.elementLabel] = stress.mises
+            all_elements_label.add(stress.elementLabel)
+    
+                # if traceS >= 0:
+                #     if stress.mises > max_stress_value:
+                #         max_stress_value = stress.mises
+                #         max_element_label = stress.elementLabel
+                            
+    all_element_labels  = sorted(all_elements_label)
+    
+    with open(csv_path_name, 'w') as f:
+        writer = csv.writer(f, lineterminator='\n')
+
+        # 헤더: Step, Frame, 그리고 모든 Element Label
+        header = ['ElementLabel']
+        for step_name, frame_num in target_step_frame:
+            header.append("{}_{}".format(step_name, frame_num))
+        writer.writerow(header)
+
+
+        # 2) 요소별로 한 행씩
+        for elem_label in all_element_labels:
+            row = [elem_label]
+            # case_keys 순서대로 traceS를 가져옴
+            for step_name, frame_num in target_step_frame:
+                step_key = (step_name, frame_num)
+                # 해당 케이스에 이 요소가 있다면 traceS, 없으면 None
+                trace_s = steps_data[step_key].get(elem_label, None)
+                row.append(trace_s)
             
-    print("Max Overall Stress: {}\n".format(max_overall_stress))
+            writer.writerow(row)
+                
+    print("...Max Stress Extraction Completed...")
     odb.close()    
-    return max_overall_stress, max_overall_element, max_overall_step, max_overall_frame
