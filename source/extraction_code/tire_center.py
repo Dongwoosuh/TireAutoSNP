@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*- 
-import os
-import csv
-import pdb
+import numpy as np
 
 from odbAccess import *
 
@@ -35,10 +33,11 @@ def tire_center_displacement_extraction(odb_name):
     
     time_graph_subrot = [] 
     displacement_graph_subrot = []
+    displcaement_graph_total = []
     for time_subrot, displacement_subrot in displacement_history_U_subrotation:
         time_graph_subrot.append(time_subrot)
         displacement_graph_subrot.append(displacement_subrot)
-        
+        displcaement_graph_total.append(displacement_subrot)
     time_graph_rot =[]
     displacement_graph_rot = []
     for time_rot, displacement_rot in displacement_history_U_rotation:
@@ -47,7 +46,8 @@ def tire_center_displacement_extraction(odb_name):
             break
         time_graph_rot.append(time_rot)
         displacement_graph_rot.append(displacement_rot)
-        # pdb.set_trace()
+        displcaement_graph_total.append(displacement_rot)
+
     max_disp_subrot = max(displacement_graph_subrot)
     min_disp_subrot = min(displacement_graph_subrot)
     subrot_gap = abs(max_disp_subrot - min_disp_subrot)
@@ -56,5 +56,13 @@ def tire_center_displacement_extraction(odb_name):
     min_disp_rot = min(displacement_graph_rot)
     rot_gap = abs(max_disp_rot - min_disp_rot)
     
-    return subrot_gap, rot_gap
+    max_disp_total = max(displcaement_graph_total)
+    min_disp_total = min(displcaement_graph_total)
+    total_gap = abs(max_disp_total - min_disp_total)
+    
+    total_std = np.std(displcaement_graph_total)
+    
+    
+    
+    return subrot_gap, rot_gap, total_gap, total_std
     
