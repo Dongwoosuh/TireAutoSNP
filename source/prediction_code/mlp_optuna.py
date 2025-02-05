@@ -38,8 +38,8 @@ network = "MLP"
 # data path -------------------------------------------------------------------
 RESOURCE_PATH = Path(__file__).parent / "resource/"
 RESULT_PATH = Path(__file__).parent / "results/"
-data_file = RESOURCE_PATH / "DOE_results_0203.csv"
-result_file = RESOURCE_PATH / "Updated_Total_results_250204.csv"
+data_file = RESOURCE_PATH / "DOE_results.csv"
+result_file = RESOURCE_PATH / "Total_results_new.csv"
 # test_datafile = RESOURCE_PATH / "TestData.csv"
 
 # 데이터 로드
@@ -57,7 +57,7 @@ input_data, input_test_data, output_data, output_test_data = train_test_split(in
 trials = 500
 train_epoch = 1000
 bestmodel_epoch = 3000
-kf = KFold(n_splits=7, shuffle=True, random_state=SEED)
+kf = KFold(n_splits=4, shuffle=True, random_state=SEED)
 
 # 데이터 정규화
 input_scaler = MinMaxScaler()
@@ -79,7 +79,7 @@ def objective(trial: Trial):
         "lr": trial.suggest_float("lr", 1e-5, 1e-1),
         "hidden_size": trial.suggest_int("hidden_size", 16, 512),
         "num_layers": trial.suggest_int("num_layers", 1, 5),
-        "batch_size": trial.suggest_categorical("batch_size", [8, 16, 32, 64, 128]),
+        "batch_size": trial.suggest_categorical("batch_size", [8, 16, 32]),
         "dropout_rate": trial.suggest_float("dropout_rate", 0.0, 0.3),
         "hidden_activation": trial.suggest_categorical(
             "hidden_activation", ["ReLU", "SiLU", "LeakyReLU", "ELU"]
@@ -113,8 +113,8 @@ def objective(trial: Trial):
         ).to(device)
 
         criterion = nn.MSELoss()
-        optimizer = torch.optim.AdamW(model.parameters(), lr=lr)
-        scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=200, T_mult=1)
+        optimizer = torch.optim.NAdam(model.parameters(), lr=lr)
+        # scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=200, T_mult=1)
 
         train_inputs, val_inputs = input_data[train_index], input_data[val_index]
         train_targets, val_targets = output_data[train_index], output_data[val_index]
@@ -138,7 +138,7 @@ def objective(trial: Trial):
                 loss = criterion(outputs, targets.float())
                 loss.backward()
                 optimizer.step()
-                scheduler.step(epoch + fold * train_epoch + 1)
+                # scheduler.step(epoch + fold * train_epoch + 1)
 
             model.eval()
             with torch.no_grad():
@@ -199,8 +199,8 @@ model = MLP(
     dropout_rate=best_dropout_rate,
 ).to(device)
 criterion = nn.MSELoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=best_lr)
-scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=200, T_mult=1)
+optimizer = torch.optim.NAdam(model.parameters(), lr=best_lr)
+# scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=200, T_mult=1)
 
 for fold, (train_index, val_index) in enumerate(kf.split(input_data)):
     train_inputs, val_inputs = input_data[train_index], input_data[val_index]
@@ -225,7 +225,7 @@ for fold, (train_index, val_index) in enumerate(kf.split(input_data)):
             loss = criterion(outputs, targets.float())
             loss.backward()
             optimizer.step()
-            scheduler.step(epoch + fold * bestmodel_epoch + 1)
+            # scheduler.step(epoch + fold * bestmodel_epoch + 1)
 
         model.eval()
         with torch.no_grad():
