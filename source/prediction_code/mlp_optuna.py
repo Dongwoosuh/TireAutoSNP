@@ -54,10 +54,10 @@ output_data = output_dataset.iloc[:, 1:].values # 오른쪽 하나
 input_data, input_test_data, output_data, output_test_data = train_test_split(input_data, output_data, test_size=0.2, random_state=SEED)
 
 # 모델 설정 -------------------------------------------------------------------
-trials = 100
+trials = 500
 train_epoch = 1000
 bestmodel_epoch = 3000
-kf = KFold(n_splits=5, shuffle=True, random_state=SEED)
+kf = KFold(n_splits=7, shuffle=True, random_state=SEED)
 
 # 데이터 정규화
 input_scaler = MinMaxScaler()
@@ -77,12 +77,12 @@ def objective(trial: Trial):
     # 하이퍼파라미터의 범위를 지정
     param = {
         "lr": trial.suggest_float("lr", 1e-5, 1e-1),
-        "hidden_size": trial.suggest_int("hidden_size", 16, 1500),
-        "num_layers": trial.suggest_int("num_layers", 1, 9),
+        "hidden_size": trial.suggest_int("hidden_size", 16, 512),
+        "num_layers": trial.suggest_int("num_layers", 1, 5),
         "batch_size": trial.suggest_categorical("batch_size", [8, 16, 32, 64, 128]),
-        "dropout_rate": trial.suggest_float("dropout_rate", 0.0, 0.7),
+        "dropout_rate": trial.suggest_float("dropout_rate", 0.0, 0.3),
         "hidden_activation": trial.suggest_categorical(
-            "hidden_activation", ["ReLU", "SiLU", "LeakyReLU", "Mish", "ELU", "SeLU"]
+            "hidden_activation", ["ReLU", "SiLU", "LeakyReLU", "ELU"]
         ),
         "output_activation": trial.suggest_categorical(
             "output_activation", ["Sigmoid"]
@@ -113,7 +113,7 @@ def objective(trial: Trial):
         ).to(device)
 
         criterion = nn.MSELoss()
-        optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+        optimizer = torch.optim.AdamW(model.parameters(), lr=lr)
         scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=200, T_mult=1)
 
         train_inputs, val_inputs = input_data[train_index], input_data[val_index]
