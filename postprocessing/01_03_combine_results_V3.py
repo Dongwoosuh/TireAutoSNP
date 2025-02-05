@@ -3,7 +3,7 @@ import pandas as pd
 
 # CSV 파일 불러오기
 max_stress_pd = pd.read_csv('./results/Total_results_tire_center.csv')
-results_pd = pd.read_csv('./results/Updated_Total_results_250203.csv')
+results_pd = pd.read_csv('./results/Updated_Total_results.csv')
 
 # 컬럼명 확인 후 공백 제거
 max_stress_pd.columns = max_stress_pd.columns.str.strip()

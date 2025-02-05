@@ -4,7 +4,7 @@ import csv
 import pdb
 
 
-odb_folder_path = './omniwheel_ref/old_2'
+odb_folder_path = './omniwheel_ref'
 odb_files = [
     os.path.join(odb_folder_path, file)
     for file in os.listdir(odb_folder_path)
@@ -85,7 +85,7 @@ for odb_name in odb_files:
 
     
 
-Total_results_file = os.path.join('results', 'Total_results_tire_center.csv')
+Total_results_file = os.path.join('results', 'Total_results.csv')
 with open(Total_results_file, "wb") as csvfile:
     writer = csv.writer(csvfile)
     # writer.writerow (["ODB Name", "Center Disp Gap(subrot)", "Center Disp Gap(rot)", "Total Center Disp Gap", "Total Center Disp Std"] )

@@ -4,7 +4,7 @@ import time
 from pathlib import Path
 import pandas as pd
 import numpy as np
-from sklearn.model_selection import KFold
+from sklearn.model_selection import KFold, train_test_split
 from sklearn.preprocessing import MinMaxScaler
 import matplotlib.pyplot as plt
 import torch
@@ -30,30 +30,34 @@ SEED = 2024
 np.random.seed(SEED)
 network = "MLP"
 # data path -------------------------------------------------------------------
-RESOURCE_PATH = Path(__file__).parent / "../../resource/"
-RESULT_PATH = Path(__file__).parent / "../../results/"
-data_file = RESOURCE_PATH / "Data.csv"
-test_datafile = RESOURCE_PATH / "TestData.csv"
+RESOURCE_PATH = Path(__file__).parent / "../resource/"
+RESULT_PATH = Path(__file__).parent / "../results/"
+data_file = RESOURCE_PATH / "DOE_results_0203.csv"
+result_file = RESOURCE_PATH / "Updated_Total_results_250204.csv"
 
 # 데이터 로드
-dataset = pd.read_csv(data_file)
-test_dataset = pd.read_csv(test_datafile)
-input_data = dataset.iloc[:, :-1].values  # 왼쪽 11열
-output_data = dataset.iloc[:, -1].values.reshape(-1, 1)  # 오른쪽 하나
-input_test_data = test_dataset.iloc[:, :-1].values
-output_test_data = test_dataset.iloc[:, -1].values.reshape(-1, 1)
+input_dataset = pd.read_csv(data_file)
+output_dataset = pd.read_csv(result_file)
+# test_dataset = pd.read_csv(test_datafile)
+input_data = input_dataset.iloc[:, :-1].values  # 왼쪽 11열
+output_data = output_dataset.iloc[:, 1:].values # 오른쪽 하나
+# input_test_data = test_dataset.iloc[:, :-1].values
+# output_test_data = test_dataset.iloc[:, -1].values.reshape(-1, 1)
+
+input_data, input_test_data, output_data, output_test_data = train_test_split(input_data, output_data, test_size=0.1, random_state=SEED)
 
 # 모델 설정 -------------------------------------------------------------------
-batch_size = 2048
-num_layers = 4
-node_num = 512
-dropout_rate = 0.0
-hidden_activation = "ReLU"
+batch_size = 64
+num_layers = 2
+node_num = 43
+dropout_rate = 0.23209045967503736
+hidden_activation = "ELU"
 output_activation = "Sigmoid"
-lr = 0.0001
-n_epochs = 20
-bestmodel_epoch = 50
-kf = KFold(n_splits=10, shuffle=True, random_state=SEED)
+lr = 0.0018959950656424502
+n_epochs = 1000
+bestmodel_epoch = 5000
+kf = KFold(n_splits=7, shuffle=True, random_state=SEED)
+
 
 # 데이터 정규화
 input_scaler = MinMaxScaler()
@@ -86,7 +90,7 @@ for fold, (train_index, val_index) in enumerate(kf.split(input_data)):
     ).to(device)
 
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=200, T_mult=1)
+    # scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=200, T_mult=1)
 
     train_inputs, val_inputs = input_data[train_index], input_data[val_index]
     train_targets, val_targets = output_data[train_index], output_data[val_index]
@@ -110,7 +114,7 @@ for fold, (train_index, val_index) in enumerate(kf.split(input_data)):
             loss = criterion(outputs, targets.float())
             loss.backward()
             optimizer.step()
-            scheduler.step(epoch + fold * n_epochs + 1)
+            # scheduler.step(epoch + fold * n_epochs + 1)
 
         model.eval()
         with torch.no_grad():
@@ -142,8 +146,8 @@ model = MLP(
 
 model.load_state_dict(best_model_state)
 
-optimizer = torch.optim.Adam(model.parameters(), lr=lr)
-scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=200, T_mult=1)
+optimizer = torch.optim.AdamW(model.parameters(), lr=lr)
+# scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=200, T_mult=1)
 
 train_dataset = TensorDataset(
     torch.from_numpy(input_data), torch.from_numpy(output_data)
@@ -159,7 +163,7 @@ for epoch in range(bestmodel_epoch):
         loss = criterion(outputs, targets.float())
         loss.backward()
         optimizer.step()
-        scheduler.step(epoch + 1)
+        # scheduler.step(epoch + 1)
 
 # In[4. Test] #################################################################
 test_dataset = TensorDataset(
@@ -187,12 +191,38 @@ output_test = (
     + output_scaler.data_min_
 )
 
-mape = np.mean(np.abs((output_test - output_pred) / output_test), axis=1) * 100
-acc = 100 - mape
-acc = np.where((acc > 100.0), 0.0, acc)
-acc = np.where((acc < 0.0), 0.0, acc)
+mape_all = np.mean(np.abs((output_test - output_pred) / output_test), axis=1) * 100
+acc_all = 100 - mape_all
+acc_all = np.where((acc_all > 100.0), 0.0, acc_all)
+acc_all = np.where((acc_all < 0.0), 0.0, acc_all)
 
-print(f"\t - accuracy [%] : {np.round(np.mean(acc),6)} ± {np.round(np.std(acc),6)}")
+# MAPE (Mean Absolute Percentage Error) 계산
+mape = np.abs(output_pred - output_test) / np.abs(output_test)
+acc_mape = (1 - mape) * 100  # MAPE 기반 정확도
+acc_mape = np.where((acc_mape > 100.0), 0.0, acc_mape)
+acc_mape = np.where((acc_mape < 0.0), 0.0, acc_mape)
+
+# RMSE (Root Mean Squared Error) 계산
+rmse = np.sqrt(np.mean((output_pred - output_test) ** 2, axis=0))
+
+# R² Score (Coefficient of Determination) 계산
+ss_res = np.sum((output_pred - output_test) ** 2, axis=0)
+ss_tot = np.sum((output_test - np.mean(output_test, axis=0)) ** 2, axis=0)
+r2_score = 1 - (ss_res / ss_tot)
+
+# 결과 출력
+result_df = pd.DataFrame({
+    "Output": [f"Output_{i+1}" for i in range(output_data.shape[1])],
+    "Mean Accuracy (MAPE %)": np.mean(acc_mape, axis=0),
+    "Std Dev Accuracy (MAPE %)": np.std(acc_mape, axis=0),
+    "RMSE": rmse,
+    "R² Score": r2_score
+})
+
+print("\nLOOCV Results:")
+print(result_df)
+
+print(f"\t - accuracy [%] : {np.round(np.mean(acc_all),6)} ± {np.round(np.std(acc_all),6)}")
 
 # In[5. Save] #################################################################
 
@@ -200,7 +230,7 @@ dir_count = len([name for name in Path(RESULT_PATH).iterdir() if name.is_dir()])
 new_dir_name = (
     f"[{dir_count+1}]_{network}_\
     "
-    f"{np.round(np.mean(acc),6)}%"
+    f"{np.round(np.mean(acc_all),6)}%"
 )
 new_dir_path = Path(RESULT_PATH) / new_dir_name
 new_dir_path.mkdir(parents=True, exist_ok=True)
@@ -210,9 +240,9 @@ for i in range(output_test.shape[1]):
     plt.figure(figsize=(10, 5))
     plt.plot(output_test[:, i], label="Actual")
     plt.plot(output_pred[:, i], label="Predicted")
-    plt.title(f"Input variable {i+1}")
+    plt.title(f"Output variable {i+1}")
     plt.legend()
-    plt.savefig(str(new_dir_path / "Sigma_HG.png"))
+    plt.savefig(str(new_dir_path / f"Output_variable_{i+1}.png"))
     plt.close()
 
 # 모델 정보 저장
@@ -226,7 +256,7 @@ with open(new_dir_path / "model_info.txt", "w") as f:
     f.write(f"Output activation: {output_activation}\n")
     f.write(f"Learning rate: {lr}\n")
     f.write(f"Epoch: {epoch}\n")
-    f.write(f"\nAccuracy: {np.round(np.mean(acc),6)}\n")
+    f.write(f"\nAccuracy: {np.round(np.mean(acc_all),6)}\n")
 
 torch.save(model.state_dict(), str((new_dir_path / "model.pt").resolve()))
 
