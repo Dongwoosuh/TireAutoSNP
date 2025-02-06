@@ -32,31 +32,31 @@ network = "MLP"
 # data path -------------------------------------------------------------------
 RESOURCE_PATH = Path(__file__).parent / "../resource/"
 RESULT_PATH = Path(__file__).parent / "../results/"
-data_file = RESOURCE_PATH / "DOE_results_0203.csv"
-result_file = RESOURCE_PATH / "Updated_Total_results_250204.csv"
+data_file = RESOURCE_PATH / "DOE_results.csv"
+result_file = RESOURCE_PATH / "Total_results_new.csv"
 
 # 데이터 로드
 input_dataset = pd.read_csv(data_file)
 output_dataset = pd.read_csv(result_file)
 # test_dataset = pd.read_csv(test_datafile)
 input_data = input_dataset.iloc[:, :-1].values  # 왼쪽 11열
-output_data = output_dataset.iloc[:, 1:].values # 오른쪽 하나
+output_data = output_dataset.iloc[:, 1:-2].values # 오른쪽 하나
 # input_test_data = test_dataset.iloc[:, :-1].values
 # output_test_data = test_dataset.iloc[:, -1].values.reshape(-1, 1)
 
 input_data, input_test_data, output_data, output_test_data = train_test_split(input_data, output_data, test_size=0.1, random_state=SEED)
 
 # 모델 설정 -------------------------------------------------------------------
-batch_size = 64
-num_layers = 2
-node_num = 43
-dropout_rate = 0.23209045967503736
-hidden_activation = "ELU"
+batch_size = 32
+num_layers = 3
+node_num = 94
+dropout_rate = 0.282100162324069
+hidden_activation = "ReLU"
 output_activation = "Sigmoid"
-lr = 0.0018959950656424502
+lr = 0.0002286604000479145
 n_epochs = 1000
 bestmodel_epoch = 5000
-kf = KFold(n_splits=7, shuffle=True, random_state=SEED)
+kf = KFold(n_splits=4, shuffle=True, random_state=SEED)
 
 
 # 데이터 정규화
