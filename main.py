@@ -4,7 +4,7 @@ import csv
 import pdb
 
 
-odb_folder_path = './omniwheel_ref'
+odb_folder_path = './omniwheel_ref/old_2'
 odb_files = [
     os.path.join(odb_folder_path, file)
     for file in os.listdir(odb_folder_path)
@@ -85,23 +85,23 @@ for odb_name in odb_files:
 
     
 
-Total_results_file = os.path.join('results', 'Total_results.csv')
-with open(Total_results_file, "wb") as csvfile:
-    writer = csv.writer(csvfile)
-    # writer.writerow (["ODB Name", "Center Disp Gap(subrot)", "Center Disp Gap(rot)", "Total Center Disp Gap", "Total Center Disp Std"] )
+# Total_results_file = os.path.join('results', 'Total_results.csv')
+# with open(Total_results_file, "wb") as csvfile:
+#     writer = csv.writer(csvfile)
+#     # writer.writerow (["ODB Name", "Center Disp Gap(subrot)", "Center Disp Gap(rot)", "Total Center Disp Gap", "Total Center Disp Std"] )
 
-    writer.writerow(["ODB Name", "Vertical Stiffness", "Max Slip Angle", "Max Slip Distance", "Bending Moment", "Torque", "Center Disp Gap(subrot)", "Center Disp Gap(rot)", "Total Center Disp Gap", "Total Center Disp Std"])
-    for i in range(len(odb_name_list)):
-        writer.writerow([
-            odb_name_list[i],
-            vertical_stiffness_list[i],
-            max_slip_angle_list[i],
-            max_slip_distance_list[i],
-            bending_moment_list[i],
-            torque_list[i],
-            subrot_center_disp_gap_list[i],
-            rot_center_disp_gap_list[i],
-            total_cetner_disp_gap_list[i],
-            total_center_disp_std_list[i]
-        ])
+#     writer.writerow(["ODB Name", "Vertical Stiffness", "Max Slip Angle", "Max Slip Distance", "Bending Moment", "Torque", "Center Disp Gap(subrot)", "Center Disp Gap(rot)", "Total Center Disp Gap", "Total Center Disp Std"])
+#     for i in range(len(odb_name_list)):
+#         writer.writerow([
+#             odb_name_list[i],
+#             vertical_stiffness_list[i],
+#             max_slip_angle_list[i],
+#             max_slip_distance_list[i],
+#             bending_moment_list[i],
+#             torque_list[i],
+#             subrot_center_disp_gap_list[i],
+#             rot_center_disp_gap_list[i],
+#             total_cetner_disp_gap_list[i],
+#             total_center_disp_std_list[i]
+#         ])
 
