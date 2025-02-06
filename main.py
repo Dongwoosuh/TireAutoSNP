@@ -25,10 +25,12 @@ subrot_center_disp_gap_list = []
 rot_center_disp_gap_list = []
 total_cetner_disp_gap_list = []
 total_center_disp_std_list = []
+max_velocity_subrot_list = []
+max_velocity_rot_list = []
 for odb_name in odb_files:
     print("\n====================== Extracting data from {} ===========================".format(odb_name))
     
-    subrot_center_disp_gap, rot_center_disp_gap, total_ceter_disp_gap, total_center_disp_std, _ = tire_center_displacement_extraction(odb_name)
+    subrot_center_disp_gap, rot_center_disp_gap, total_ceter_disp_gap, total_center_disp_std, max_velocity_subrot, max_velocity_rot = tire_center_displacement_extraction(odb_name)
     vertical_stiffness = vertical_stiffness_extraction(odb_name, instance_name)
     max_slip_angle, max_slip_distance, target_step_frame_list = slip_angle_dist_extraction(odb_name, instance_name)
     bending_moment = bending_moment_extraction(odb_name)
@@ -36,15 +38,14 @@ for odb_name in odb_files:
     contact_area_extraction(odb_name)
     
     max_stress_extraction(odb_name, instance_name, target_step_frame_list)
-    # # pdb.set_trace()
-    # print("max_overall_step: ", max_overall_step)
-    # print("max_overall_frame: ", max_overall_frame) 
-    
 
 
+    ## CSV output file
     odb_base_name = os.path.basename(odb_name).replace(".odb", "")
     odb_name_list.append(odb_base_name)
-    # max_overall_stress_list.append(max_overall_stress)
+    
+    
+    # # max_overall_stress_list.append(max_overall_stress)
     vertical_stiffness_list.append(vertical_stiffness)
     max_slip_angle_list.append(max_slip_angle)
     max_slip_distance_list.append(max_slip_distance)
@@ -54,6 +55,10 @@ for odb_name in odb_files:
     rot_center_disp_gap_list.append(rot_center_disp_gap)
     total_cetner_disp_gap_list.append(total_ceter_disp_gap)
     total_center_disp_std_list.append(total_center_disp_std)
+    max_velocity_subrot_list.append(max_velocity_subrot)
+    max_velocity_rot_list.append(max_velocity_rot)
+    
+    
     
     # write csv for sungneung yoso
     # odb_base_name = os.path.basename(odb_name).replace(".odb", "")
@@ -85,23 +90,25 @@ for odb_name in odb_files:
 
     
 
-# Total_results_file = os.path.join('results', 'Total_results.csv')
+# Total_results_file = os.path.join('results', 'Total_Max_velocity.csv')
 # with open(Total_results_file, "wb") as csvfile:
 #     writer = csv.writer(csvfile)
-#     # writer.writerow (["ODB Name", "Center Disp Gap(subrot)", "Center Disp Gap(rot)", "Total Center Disp Gap", "Total Center Disp Std"] )
-
-#     writer.writerow(["ODB Name", "Vertical Stiffness", "Max Slip Angle", "Max Slip Distance", "Bending Moment", "Torque", "Center Disp Gap(subrot)", "Center Disp Gap(rot)", "Total Center Disp Gap", "Total Center Disp Std"])
+#     writer.writerow (["ODB Name", "Max Velocity(subrot)", "Max Velocity(rot)"] )
+    
+#     # writer.writerow(["ODB Name", "Vertical Stiffness", "Max Slip Angle", "Max Slip Distance", "Bending Moment", "Torque", "Center Disp Gap(subrot)", "Center Disp Gap(rot)", "Total Center Disp Gap", "Total Center Disp Std"])
 #     for i in range(len(odb_name_list)):
 #         writer.writerow([
 #             odb_name_list[i],
-#             vertical_stiffness_list[i],
-#             max_slip_angle_list[i],
-#             max_slip_distance_list[i],
-#             bending_moment_list[i],
-#             torque_list[i],
-#             subrot_center_disp_gap_list[i],
-#             rot_center_disp_gap_list[i],
-#             total_cetner_disp_gap_list[i],
-#             total_center_disp_std_list[i]
+#             # vertical_stiffness_list[i],
+#             # max_slip_angle_list[i],
+#             # max_slip_distance_list[i],
+#             # bending_moment_list[i],
+#             # torque_list[i],
+#             # subrot_center_disp_gap_list[i],
+#             # rot_center_disp_gap_list[i],
+#             # total_cetner_disp_gap_list[i],
+#             # total_center_disp_std_list[i]
+#             max_velocity_subrot_list[i],
+#             max_velocity_rot_list[i]
 #         ])
 

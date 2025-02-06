@@ -2,6 +2,7 @@
 import numpy as np
 import os
 import csv
+import pdb
 from odbAccess import *
 
 __all__ = ['tire_center_displacement_extraction']
@@ -35,10 +36,10 @@ def tire_center_displacement_extraction(odb_name):
     time_graph_total = []
     time_graph_subrot = [] 
     displacement_graph_subrot = []
-    velocity_graph = []
+    velocity_graph_subrot = []
+    velocity_graph_total = []
     prev_time = None
     prev_disp = None
-    
     displcaement_graph_total = []
     
     
@@ -49,10 +50,12 @@ def tire_center_displacement_extraction(odb_name):
         time_graph_total.append(time_subrot)
         if prev_time is not None and prev_disp is not None:
             velocity = (displacement_subrot - prev_disp) / (time_subrot - prev_time)
-            velocity_graph.append(velocity)
+            velocity_graph_subrot.append(velocity)
+            velocity_graph_total.append(velocity)
             
         else:
-            velocity_graph.append(0)
+            velocity_graph_subrot.append(0)
+            velocity_graph_total.append(0)
             
         prev_time = time_subrot
         prev_disp = displacement_subrot
@@ -61,8 +64,9 @@ def tire_center_displacement_extraction(odb_name):
     time_rot_start = time_graph_subrot[-1]
     time_graph_rot =[]
     displacement_graph_rot = []
-    prve_time = None
-    prev_disp = None
+    velocity_graph_rot = []
+    prve_time_ = None
+    prev_disp_ = None
     
     for time_rot, displacement_rot in displacement_history_U_rotation:
         
@@ -73,14 +77,16 @@ def tire_center_displacement_extraction(odb_name):
         displacement_graph_rot.append(displacement_rot)
         displcaement_graph_total.append(displacement_rot)
         
-        if prev_time is not None and prev_disp is not None:
+        if prve_time_ is not None and prev_disp_ is not None:
             velocity = (displacement_rot - prev_disp) / (time_rot - prev_time)
-            velocity_graph.append(velocity)
+            velocity_graph_rot.append(velocity)
+            velocity_graph_total.append(velocity)
         else:
-            velocity_graph.append(0)
+            velocity_graph_rot.append(0)
+            velocity_graph_total.append(0)
         
-        prev_time = time_rot
-        prev_disp = displacement_rot
+        prve_time_ = time_rot
+        prev_disp_ = displacement_rot
         
     max_disp_subrot = max(displacement_graph_subrot)
     min_disp_subrot = min(displacement_graph_subrot)
@@ -96,8 +102,10 @@ def tire_center_displacement_extraction(odb_name):
     
     total_std = np.std(displcaement_graph_total)
     
+    max_velocity_subrot = max([abs(velocity) for velocity in velocity_graph_subrot])
+    max_velocity_rot = max(abs(velocity) for velocity in velocity_graph_rot)
     
-    # CSV output file
+        # CSV output file
     odb_base_name = os.path.basename(odb_name).replace(".odb", "")
     csv_file_name = os.path.basename(odb_name).replace(".odb", ".csv")
     csv_path_name = os.path.join('results','Tire_center', csv_file_name)
@@ -105,8 +113,8 @@ def tire_center_displacement_extraction(odb_name):
     with open(csv_path_name, 'w') as csvfile:
         writer = csv.writer(csvfile, lineterminator='\n')
         writer.writerow(['Time', 'Total Displacement', 'Velocity'])
-        for i in range(len(velocity_graph)):
-            writer.writerow([time_graph_total[i], displcaement_graph_total[i], velocity_graph[i]])
-    
-    return subrot_gap, rot_gap, total_gap, total_std, velocity_graph
+        for i in range(len(velocity_graph_total)):
+            writer.writerow([time_graph_total[i], displcaement_graph_total[i], velocity_graph_total[i]])
+            
+    return subrot_gap, rot_gap, total_gap, total_std, max_velocity_subrot, max_velocity_rot
     
