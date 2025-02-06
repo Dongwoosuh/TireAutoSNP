@@ -4,7 +4,7 @@ import csv
 import pdb
 
 
-odb_folder_path = './omniwheel_ref/old_2'
+odb_folder_path = './omniwheel_ref'
 odb_files = [
     os.path.join(odb_folder_path, file)
     for file in os.listdir(odb_folder_path)
@@ -28,7 +28,7 @@ total_center_disp_std_list = []
 for odb_name in odb_files:
     print("\n====================== Extracting data from {} ===========================".format(odb_name))
     
-    subrot_center_disp_gap, rot_center_disp_gap, total_ceter_disp_gap, total_center_disp_std = tire_center_displacement_extraction(odb_name)
+    subrot_center_disp_gap, rot_center_disp_gap, total_ceter_disp_gap, total_center_disp_std, _ = tire_center_displacement_extraction(odb_name)
     vertical_stiffness = vertical_stiffness_extraction(odb_name, instance_name)
     max_slip_angle, max_slip_distance, target_step_frame_list = slip_angle_dist_extraction(odb_name, instance_name)
     bending_moment = bending_moment_extraction(odb_name)

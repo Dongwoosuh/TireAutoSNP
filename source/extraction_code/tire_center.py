@@ -32,6 +32,7 @@ def tire_center_displacement_extraction(odb_name):
     displacement_history_U_subrotation = history_region_subrotation.historyOutputs['U2'].data  
     displacement_history_U_rotation = history_region_rotation.historyOutputs['U2'].data 
     
+    time_graph_total = []
     time_graph_subrot = [] 
     displacement_graph_subrot = []
     velocity_graph = []
@@ -45,7 +46,7 @@ def tire_center_displacement_extraction(odb_name):
         time_graph_subrot.append(time_subrot)
         displacement_graph_subrot.append(displacement_subrot)
         displcaement_graph_total.append(displacement_subrot)
-        
+        time_graph_total.append(time_subrot)
         if prev_time is not None and prev_disp is not None:
             velocity = (displacement_subrot - prev_disp) / (time_subrot - prev_time)
             velocity_graph.append(velocity)
@@ -56,7 +57,8 @@ def tire_center_displacement_extraction(odb_name):
         prev_time = time_subrot
         prev_disp = displacement_subrot
         
-        
+    
+    time_rot_start = time_graph_subrot[-1]
     time_graph_rot =[]
     displacement_graph_rot = []
     prve_time = None
@@ -67,6 +69,7 @@ def tire_center_displacement_extraction(odb_name):
         if time_rot > 0.0762:
             break
         time_graph_rot.append(time_rot)
+        time_graph_total.append(time_rot + time_rot_start)
         displacement_graph_rot.append(displacement_rot)
         displcaement_graph_total.append(displacement_rot)
         
@@ -79,7 +82,6 @@ def tire_center_displacement_extraction(odb_name):
         prev_time = time_rot
         prev_disp = displacement_rot
         
-
     max_disp_subrot = max(displacement_graph_subrot)
     min_disp_subrot = min(displacement_graph_subrot)
     subrot_gap = abs(max_disp_subrot - min_disp_subrot)
@@ -102,9 +104,9 @@ def tire_center_displacement_extraction(odb_name):
     
     with open(csv_path_name, 'w') as csvfile:
         writer = csv.writer(csvfile, lineterminator='\n')
-        writer.writerow(['Time', 'Displacement_subrot', 'Displacement_rot', 'Velocity'])
-        for i in range(len(time_graph_subrot)):
-            writer.writerow([time_graph_subrot[i], displacement_graph_subrot[i], displacement_graph_rot[i], velocity_graph[i]])
+        writer.writerow(['Time', 'Total Displacement', 'Velocity'])
+        for i in range(len(velocity_graph)):
+            writer.writerow([time_graph_total[i], displcaement_graph_total[i], velocity_graph[i]])
     
     return subrot_gap, rot_gap, total_gap, total_std, velocity_graph
     
