@@ -26,7 +26,7 @@ else:
 print("Current device: ", device)
 
 # seed -----------------------------------------------------------------------
-SEED = 2024
+SEED = 2025
 np.random.seed(SEED)
 network = "MLP"
 # data path -------------------------------------------------------------------
@@ -40,7 +40,7 @@ input_dataset = pd.read_csv(data_file)
 output_dataset = pd.read_csv(result_file)
 # test_dataset = pd.read_csv(test_datafile)
 input_data = input_dataset.iloc[:, :-1].values  # 왼쪽 11열
-output_data = output_dataset.iloc[:, 1:-2].values # 오른쪽 하나
+output_data = output_dataset.iloc[:, 1:].values # 오른쪽 하나
 # input_test_data = test_dataset.iloc[:, :-1].values
 # output_test_data = test_dataset.iloc[:, -1].values.reshape(-1, 1)
 
@@ -48,16 +48,15 @@ input_data, input_test_data, output_data, output_test_data = train_test_split(in
 
 # 모델 설정 -------------------------------------------------------------------
 batch_size = 32
-num_layers = 3
-node_num = 94
-dropout_rate = 0.282100162324069
-hidden_activation = "ReLU"
+num_layers = 2
+node_num = 24
+dropout_rate = 0.29993927967790496
+hidden_activation = "ELU"
 output_activation = "Sigmoid"
-lr = 0.0002286604000479145
+lr = 0.005531931628790238
 n_epochs = 1000
 bestmodel_epoch = 5000
 kf = KFold(n_splits=4, shuffle=True, random_state=SEED)
-
 
 # 데이터 정규화
 input_scaler = MinMaxScaler()
@@ -71,6 +70,8 @@ input_data = input_data.astype(np.float32)
 input_test_data = input_test_data.astype(np.float32)
 output_data = output_data.astype(np.float32)
 output_test_data = output_test_data.astype(np.float32)
+
+
 
 # 모델 생성 및 학습 설정
 criterion = nn.MSELoss()
@@ -210,13 +211,16 @@ ss_res = np.sum((output_pred - output_test) ** 2, axis=0)
 ss_tot = np.sum((output_test - np.mean(output_test, axis=0)) ** 2, axis=0)
 r2_score = 1 - (ss_res / ss_tot)
 
+mae = np.mean(np.abs(output_pred - output_test), axis=0)
+
 # 결과 출력
 result_df = pd.DataFrame({
     "Output": [f"Output_{i+1}" for i in range(output_data.shape[1])],
     "Mean Accuracy (MAPE %)": np.mean(acc_mape, axis=0),
     "Std Dev Accuracy (MAPE %)": np.std(acc_mape, axis=0),
     "RMSE": rmse,
-    "R² Score": r2_score
+    "R² Score": r2_score,
+    "MAE": mae
 })
 
 print("\nLOOCV Results:")
@@ -259,5 +263,15 @@ with open(new_dir_path / "model_info.txt", "w") as f:
     f.write(f"\nAccuracy: {np.round(np.mean(acc_all),6)}\n")
 
 torch.save(model.state_dict(), str((new_dir_path / "model.pt").resolve()))
+
+import joblib
+# MinMaxScaler 저장 (학습 후)
+scaler_path = new_dir_path / "scalers"
+scaler_path.mkdir(parents=True, exist_ok=True)
+input_scaler_file = str(scaler_path / "input_scaler.pkl")
+output_scaler_file = str(scaler_path / "output_scaler.pkl")
+
+joblib.dump(input_scaler, input_scaler_file)
+joblib.dump(output_scaler, output_scaler_file)
 
 print("Execution time: ", time.time() - start_time, "s")
