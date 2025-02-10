@@ -3,6 +3,21 @@ import os
 import csv
 import pdb
 
+results_folder = './results'
+if not os.path.exists(results_folder):
+    os.makedirs(results_folder)
+
+required_subfolders = ['CAREA', 'Stress_all', 'Tire_center', 'Torque', 'Total_results']
+
+for subfolder in required_subfolders:
+    subfolder_path = os.path.join(results_folder, subfolder)
+    if not os.path.exists(subfolder_path):
+        os.makedirs(subfolder_path)
+        print("{} folder has been created".format(subfolder_path))
+    else:
+        print("{} is already exist".format(subfolder_path))
+
+        
 
 odb_folder_path = './omniwheel_ref'
 odb_files = [
@@ -27,15 +42,18 @@ total_cetner_disp_gap_list = []
 total_center_disp_std_list = []
 max_velocity_subrot_list = []
 max_velocity_rot_list = []
+target_contact_area_list = []
 for odb_name in odb_files:
     print("\n====================== Extracting data from {} ===========================".format(odb_name))
     
+    target_contact_area  = contact_area_extraction(odb_name)
     subrot_center_disp_gap, rot_center_disp_gap, total_ceter_disp_gap, total_center_disp_std, max_velocity_subrot, max_velocity_rot = tire_center_displacement_extraction(odb_name)
     vertical_stiffness = vertical_stiffness_extraction(odb_name, instance_name)
     max_slip_angle, max_slip_distance, target_step_frame_list = slip_angle_dist_extraction(odb_name, instance_name)
     bending_moment = bending_moment_extraction(odb_name)
     torque_last_frame, max_torque = torque_extraction(odb_name)
     contact_area_extraction(odb_name)
+    
     
     max_stress_extraction(odb_name, instance_name, target_step_frame_list)
 
@@ -46,6 +64,7 @@ for odb_name in odb_files:
     
     
     # # max_overall_stress_list.append(max_overall_stress)
+    target_contact_area_list.append(target_contact_area)
     vertical_stiffness_list.append(vertical_stiffness)
     max_slip_angle_list.append(max_slip_angle)
     max_slip_distance_list.append(max_slip_distance)
@@ -78,8 +97,8 @@ for odb_name in odb_files:
     odb_base_name = os.path.basename(odb_name).replace(".odb", "")
     csv_file_name = os.path.basename(odb_name).replace(".odb", ".csv")
     csv_file_name = os.path.join('results','Total_results', csv_file_name)
-    headers = ["ODB Name", "Vertical Stiffness", "Max Slip Angle", "Max Slip Distance", "Bending Moment", "Torque", "Center Disp Gap(subrot)", "Center Disp Gap(rot)", "Total Center Disp Gap", "Total Center Disp Std"] 
-    values = [odb_base_name, vertical_stiffness, max_slip_angle, max_slip_distance, bending_moment, torque_last_frame, subrot_center_disp_gap, rot_center_disp_gap, total_ceter_disp_gap, total_center_disp_std]
+    headers = ["ODB Name", "Vertical Stiffness", "Max Slip Angle", "Max Slip Distance", "Bending Moment", "Torque", "Center Disp Gap(subrot)", "Center Disp Gap(rot)", "Total Center Disp Gap", "Total Center Disp Std", "Max Velocity(subrot)", "Max Velocity(rot)", "Target Contact Area"] 
+    values = [odb_base_name, vertical_stiffness, max_slip_angle, max_slip_distance, bending_moment, torque_last_frame, subrot_center_disp_gap, rot_center_disp_gap, total_ceter_disp_gap, total_center_disp_std, max_velocity_subrot, max_velocity_rot, target_contact_area]
 
     with open(csv_file_name, 'wb') as csvfile:
         writer = csv.writer(csvfile)
@@ -90,11 +109,11 @@ for odb_name in odb_files:
 
     
 
-# Total_results_file = os.path.join('results', 'Total_Max_velocity.csv')
+# Total_results_file = os.path.join('results', 'Total_target_carea.csv')
 # with open(Total_results_file, "wb") as csvfile:
 #     writer = csv.writer(csvfile)
-#     writer.writerow (["ODB Name", "Max Velocity(subrot)", "Max Velocity(rot)"] )
-    
+#     # writer.writerow (["ODB Name", "Max Velocity(subrot)", "Max Velocity(rot)"] )
+#     writer.writerow (["ODB Name", "Target Contact Area"] )
 #     # writer.writerow(["ODB Name", "Vertical Stiffness", "Max Slip Angle", "Max Slip Distance", "Bending Moment", "Torque", "Center Disp Gap(subrot)", "Center Disp Gap(rot)", "Total Center Disp Gap", "Total Center Disp Std"])
 #     for i in range(len(odb_name_list)):
 #         writer.writerow([
@@ -108,7 +127,8 @@ for odb_name in odb_files:
 #             # rot_center_disp_gap_list[i],
 #             # total_cetner_disp_gap_list[i],
 #             # total_center_disp_std_list[i]
-#             max_velocity_subrot_list[i],
-#             max_velocity_rot_list[i]
+#             # max_velocity_subrot_list[i],
+#             # max_velocity_rot_list[i],
+#             target_contact_area_list[i]
 #         ])
 

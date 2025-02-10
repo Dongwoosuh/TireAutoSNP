@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*- 
 import os
 import csv
-
+import pdb
 from odbAccess import *
 
 __all__ = ['contact_area_extraction']
@@ -9,6 +9,7 @@ __all__ = ['contact_area_extraction']
 def contact_area_extraction(odb_name):
     print("...Contact Area Extraction...")
 # CSV output file
+    first_frame_contact_area = None
     odb_base_name = os.path.basename(odb_name).replace(".odb", "")
     csv_file_name = os.path.basename(odb_name).replace(".odb", ".csv")
     csv_path_name = os.path.join('results','CAREA', csv_file_name)
@@ -22,7 +23,6 @@ def contact_area_extraction(odb_name):
         odb = openOdb(path=odb_name, readOnly=True)
         step_names = list(odb.steps.keys())
         # Iterate over steps
-        
         for step_name in step_names[1:]:
             step = odb.steps[step_name]
 
@@ -40,6 +40,9 @@ def contact_area_extraction(odb_name):
             carea_data = history_region.historyOutputs['CAREA    ASSEMBLY_TIRE/ASSEMBLY_GROUND'].data
             # Write CAREA data to CSV and print
             
+            if step_name == 'subrotation':
+                first_frame_contact_area  = carea_data[0][1]
+                
             if carea_data:
                 for time, area in carea_data:
                         csvwriter.writerow([step_name,'{:.6f}'.format(time), '{:.6f}'.format(area)])   
@@ -48,8 +51,12 @@ def contact_area_extraction(odb_name):
                 pass
             
                 
-            
+        
 
-                # print("Step: {}, Time: {}, CAREA: {}".format(step_name, time, area))
+            # print("Step: {}, Time: {}, CAREA: {}".format(step_name, time, area))
     print("Contact Area extraction completed.\n") 
     odb.close()
+            
+    return first_frame_contact_area
+            
+            
