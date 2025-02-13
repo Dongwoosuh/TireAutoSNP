@@ -8,5 +8,5 @@ combine_results()
 max_stress_after_outlier_removal()
 combine_max_stress()
 # combine_max_velocity()
-# filter_doe_results()
+filter_doe_results()
 
