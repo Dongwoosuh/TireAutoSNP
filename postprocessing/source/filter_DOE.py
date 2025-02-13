@@ -6,7 +6,7 @@ __all__ = ['filter_doe_results']
 def filter_doe_results():
     # 파일 경로 설정
     total_results_path = './results/Total_results_new.csv'
-    doe_results_path = './postprocessing/result/Total_0203.csv'
+    doe_results_path = './postprocessing/result/Total_sampling_DOE_0210.csv'
 
     # 파일 읽기
     total_results = pd.read_csv(total_results_path)
@@ -26,11 +26,22 @@ def filter_doe_results():
         key=lambda x: x.map(natural_sort_key),  # 문자열과 숫자 분리하여 정렬
         ascending=True
     )
+    
+    filtered_results_df = total_results.sort_values(
+        by=total_results.columns[0], 
+        key=lambda x: x.map(natural_sort_key),  # 문자열과 숫자 분리하여 정렬
+        ascending=True
+    )
 
 
     # 결과 저장
     filtered_doe_results_path = './source/prediction_code/resource/DOE_results.csv'
     filtered_doe_results_path2 = './results/DOE_results.csv'
+    filtered_results_df_path = './source/prediction_code/resource/Total_results_new.csv'
+    filtered_results_df_path2 = './results/Total_results_new.csv'
+    
+    filtered_results_df.to_csv(filtered_results_df_path, index=False)
+    filtered_results_df.to_csv(filtered_results_df_path2, index=False)
     filtered_doe_results.to_csv(filtered_doe_results_path, index=False)
     filtered_doe_results.to_csv(filtered_doe_results_path2, index=False)
 
