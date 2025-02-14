@@ -6,7 +6,7 @@ __all__ = ['combine_results'] # 외부에서 import할 수 있는 함수 목록
 
 def combine_results():
     # 폴더 경로 설정
-    folder_path = './results/total_results'
+    folder_path = './results/Total_results'
     # csv_files = sorted([f for f in os.listdir(folder_path) if re.match(r"Run\d+\.csv", f)],
     #                     key=lambda x: int(re.search(r"\d+", x).group()))
 
@@ -32,8 +32,8 @@ def combine_results():
             print(f"Error reading {file_name}: {e}")
 
     # 새 헤더 정의
-    columns = ["ODB Name", "Avg Vertical Stiffness", "Last Vertical Stiffness","Initial Vertical Stiffness", "Max Slip Angle", "Max Slip Distance", "Bending Moment", "Torque", "Center Disp Gap(subrot)", "Center Disp Gap(rot)", 
-               "Total Center Disp Gap", "Total Center Disp Std", "Max Velocity(subrot)", "Max Velocity(rot)", "Target Contact Area", "Subrot Stop Time", "Rot Stop Time"] 
+    columns = ["ODB Name", "Vertical Stiffness", "Max Slip Angle", "Max Slip Distance", "Bending Moment", "Torque", "Center Disp Gap(subrot)", "Center Disp Gap(rot)", "Total Center Disp Gap",
+            "Total Center Disp Std", "Max Velocity(subrot)", "Max Velocity(rot)", "Target Contact Area", "Subrot Stop Time", "Rot Stop Time", "Max Rot Contact Area"] 
 
     # 마지막 행들을 데이터프레임으로 변환
     result_df = pd.DataFrame(last_rows, columns=columns)
