@@ -3,12 +3,14 @@ import os
 import csv
 import pdb
 from odbAccess import *
+import numpy as np
 
 __all__ = ['contact_area_extraction']
 
 def contact_area_extraction(odb_name):
     print("...Contact Area Extraction...")
 # CSV output file
+    rot_carea_list = []
     first_frame_contact_area = None
     odb_base_name = os.path.basename(odb_name).replace(".odb", "")
     csv_file_name = os.path.basename(odb_name).replace(".odb", ".csv")
@@ -42,7 +44,19 @@ def contact_area_extraction(odb_name):
             
             if step_name == 'subrotation':
                 first_frame_contact_area  = carea_data[0][1]
+                for time, area in carea_data:
+                    rot_carea_list.append(area)
+                max_rot_carea = np.max(rot_carea_list)
+                print(max_rot_carea)
+                    # print("Standard Deviation of rot_carea_list: {:.6f}".format(max_rot_carea))             
+                       
+            # if step_name == 'rotation':
                 
+            #     for time, area in carea_data:
+            #         rot_carea_list.append(area)
+            #         std_rot_carea = np.std(rot_carea_list)
+            #         print("Standard Deviation of rot_carea_list: {:.6f}".format(std_rot_carea))
+                    
             if carea_data:
                 for time, area in carea_data:
                         csvwriter.writerow([step_name,'{:.6f}'.format(time), '{:.6f}'.format(area)])   
@@ -57,6 +71,6 @@ def contact_area_extraction(odb_name):
     print("Contact Area extraction completed.\n") 
     odb.close()
             
-    return first_frame_contact_area
+    return first_frame_contact_area, max_rot_carea
             
             

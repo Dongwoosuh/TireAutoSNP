@@ -297,6 +297,7 @@ def get_angle_per_frame(odb, step, myInstance, node_1, node_2, contact_node):
     """Calculate the angle between two vectors in 3D space in SUB-ROTATION Step."""
     outlier_check =0
     outlier_exist = False
+    stop_time_ = 0
     ## Calculate the vectors of nodes for the initial frame
     len_frames = len(step.frames)
     first_frame = step.frames[0]
@@ -355,8 +356,9 @@ def get_angle_per_frame(odb, step, myInstance, node_1, node_2, contact_node):
             if outlier_check == 0:
                 contact_status = False
                 outlier_exist =True
+                
             contact_status = False
-            stop_time = new_frame.frameValue
+            stop_time_ = new_frame.frameValue
         else: 
             contact_status = True
             outlier_check += 1
@@ -372,7 +374,7 @@ def get_angle_per_frame(odb, step, myInstance, node_1, node_2, contact_node):
             break
         
     # odb.close()
-    return angles_list, stop_time, outlier_exist
+    return angles_list, stop_time_, outlier_exist
 
 def calculate_angle_between_vectors(v1, v2):
     """Calculate the angle between two vectors in 3D space."""
