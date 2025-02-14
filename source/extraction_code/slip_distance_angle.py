@@ -165,7 +165,8 @@ def     slip_angle_dist_extraction(odb_name, instance_name):
             max_angle_difference = angle_differences[i]
         else:
             break            
-    max_angle_index = angle_differences.index(max_angle_difference)
+    # max_angle_index = angle_differences.index(max_angle_difference)
+    max_angle_index = len(angle_differences)
     
     print("Max angle difference: {} at frame {}".format(max_angle_difference, max_angle_index))
     
@@ -284,9 +285,11 @@ def get_slip_dist(odb, step, myInstance, node_1, node_2):
     abs_angle_differences = [abs(diff_angle) for frame_value, curr_angle_ba, current_angle_ca, diff_angle in angle_differences]
     # return max_slip_angle, max_distance_gap
     max_slip_angle = max(abs_angle_differences)
-    index = abs_angle_differences.index(max_slip_angle)
     max_slip_dist = math.radians(max_slip_angle) * 150
     
+    # index1 = abs_angle_differences.index(max_slip_angle)
+    index = len(angle_differences)
+    pdb.set_trace()
     # odb.close()
     return max_slip_dist, max_slip_angle, index, stop_time
 
