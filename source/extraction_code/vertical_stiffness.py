@@ -82,15 +82,9 @@ def vertical_stiffness_extraction(odb_name, instance_name, graph_plot=False):
 
     
     last_frame_timestep = time_graph[-1] - time_graph[-2]
-    last_frame_timestep_2 = time_graph[-2] - time_graph[-3]
-
     last_frame_displacement = displacement_graph[-1] - displacement_graph[-2]
-    last_frame_displacement_2 = displacement_graph[-2] - displacement_graph[-3]
 
     last_frame_stiffness = force_ori*last_frame_timestep / last_frame_displacement  
-    last_frame_stiffness_2 = force_ori*last_frame_timestep_2 / last_frame_displacement_2
-
-    last_frame_stiffness = (last_frame_stiffness + last_frame_stiffness_2) / 2
 
 
 

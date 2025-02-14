@@ -58,7 +58,7 @@ for odb_name in odb_files:
     # do not save the data if outlier_bool is True
     if outlier_bool:
         continue
-    # displacement_last_frame = vertical_stiffness_extraction(odb_name, instance_name) # using last frame and first frame
+    displacement_last_frame = vertical_stiffness_extraction(odb_name, instance_name) # using last frame and first frame
     # target_contact_area, max_rot_carea  = contact_area_extraction(odb_name)
     # subrot_center_disp_gap, rot_center_disp_gap, total_ceter_disp_gap, total_center_disp_std, max_velocity_subrot, max_velocity_rot = tire_center_displacement_extraction(odb_name)
     # bending_moment = bending_moment_extraction(odb_name)
@@ -126,11 +126,11 @@ for odb_name in odb_files:
 
     
 
-Total_results_file = os.path.join('results', 'time_results_max_stress.csv')
+Total_results_file = os.path.join('results', 'Stiffness_time_results_max_stress.csv')
 with open(Total_results_file, "wb") as csvfile:
     writer = csv.writer(csvfile)
     # writer.writerow (["ODB Name", "Vertical Stiffness"] )
-    writer.writerow (["ODB Name", "Subrot Stop Time", "Rot Stop Time"] )
+    writer.writerow (["ODB Name", "Vertical Stiffness", "Subrot Stop Time", "Rot Stop Time"] )
     # writer.writerow(["ODB Name", "Vertical Stiffness", "Max Slip Angle", "Max Slip Distance", "Bending Moment", "Torque", "Center Disp Gap(subrot)", "Center Disp Gap(rot)", "Total Center Disp Gap", "Total Center Disp Std", "Max Velocity(subrot)", "Max Velocity(rot)", "Target Contact Area", "Subrot Stop Time", "Rot Stop Time"])
     # writer.writerow(["ODB Name", "Vertical Stiffness", "Max Slip Angle", "Max Slip Distance", "Bending Moment", "Torque", "Center Disp Gap(subrot)", "Center Disp Gap(rot)", "Total Center Disp Gap", "Total Center Disp Std", "Max Velocity(subrot)", "Max Velocity(rot)", "Target Contact Area", "Subrot Stop Time", "Rot Stop Time", "Max Rot Contact Area"])
   
@@ -140,7 +140,7 @@ with open(Total_results_file, "wb") as csvfile:
             # avg_vertical_stiffness_list[i],
             # last_vertical_stiffness_list[i],
             # initial_vertical_stiffness_list[i],
-            # displacement_last_frame_list[i],
+            displacement_last_frame_list[i],
             # max_slip_angle_list[i],
             # max_slip_distance_list[i],
             # bending_moment_list[i],
