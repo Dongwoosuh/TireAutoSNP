@@ -289,7 +289,6 @@ def get_slip_dist(odb, step, myInstance, node_1, node_2):
     
     # index1 = abs_angle_differences.index(max_slip_angle)
     index = len(angle_differences)
-    pdb.set_trace()
     # odb.close()
     return max_slip_dist, max_slip_angle, index, stop_time
 
