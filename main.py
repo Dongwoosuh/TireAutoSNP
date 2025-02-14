@@ -79,7 +79,7 @@ for odb_name in odb_files:
     # last_vertical_stiffness_list.append(last_vertical_stiffness)
     # initial_vertical_stiffness_list.append(initial_vertical_stiffness)
     
-    # displacement_last_frame_list.append(displacement_last_frame)
+    displacement_last_frame_list.append(displacement_last_frame)
     # max_slip_angle_list.append(max_slip_angle)
     # max_slip_distance_list.append(max_slip_distance)
     # bending_moment_list.append(bending_moment)
@@ -152,8 +152,8 @@ with open(Total_results_file, "wb") as csvfile:
             # max_velocity_subrot_list[i],
             # max_velocity_rot_list[i],
             # target_contact_area_list[i],
-            # subrot_stoptime_list[i],
+            subrot_stoptime_list[i],
             rot_stoptime_list[i],
-            max_rot_carea_list[i]
+            # max_rot_carea_list[i]
             ])
 
