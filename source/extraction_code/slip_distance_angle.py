@@ -263,7 +263,7 @@ def get_slip_dist(odb, step, myInstance, node_1, node_2):
         current_vector_ba = [current_node_1[i] - center2_current_coords[i] for i in range(3)]
         current_vector_ca = [current_node_2[i] - center2_current_coords[i] for i in range(3)]
         
-        if current_node_1[1] > -79.9:
+        if current_node_1[1] > -79.99:
             contact_status = False
             stop_time = new_frame.frameValue
         else: 
@@ -347,7 +347,7 @@ def get_angle_per_frame(odb, step, myInstance, node_1, node_2, contact_node):
         current_vector_ba = [current_node_1[i] - current_node_2[i] for i in range(3)]
         
         ## Calculate the frame where the contact stopped, that is why we need "contact_node"
-        if current_contact_node[1] > -79.9:
+        if current_contact_node[1] > -79.99:
             contact_status = False
             stop_time = new_frame.frameValue
         else: 
