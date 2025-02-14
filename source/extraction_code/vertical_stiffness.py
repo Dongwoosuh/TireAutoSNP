@@ -40,21 +40,24 @@ def vertical_stiffness_extraction(odb_name, instance_name, graph_plot=False):
 
     force_ori = 150
     # Force and Stiffness Calculation
-    for i in range(len(time_graph)):
-        time = time_graph[i]
-        force = force_ori * time  # 시간에 따라 선형 증가하는 힘
-        force_graph.append(force)
-        if i > 0:
-            # 이전 단계의 데이터와 현재 데이터를 이용하여 강성 계산
-            displacement_diff =(displacement_graph[i] - displacement_graph[i - 1])
-            force_diff = force_graph[i] - force_graph[i - 1]
-            stiffness = force_diff / displacement_diff if displacement_diff != 0 else 0
-            stiffness_graph.append(stiffness)
-        else:
-            stiffness_graph.append(0)  # 초기값
+    # for i in range(len(time_graph)):
+    #     time = time_graph[i]
+    #     force = force_ori * time  # 시간에 따라 선형 증가하는 힘
+    #     force_graph.append(force)
+    #     if i > 0:
+    #         # 이전 단계의 데이터와 현재 데이터를 이용하여 강성 계산
+    #         displacement_diff =(displacement_graph[i] - displacement_graph[i - 1])
+    #         force_diff = force_graph[i] - force_graph[i - 1]
+    #         stiffness = force_diff / displacement_diff if displacement_diff != 0 else 0
+    #         stiffness_graph.append(stiffness)
+    #     else:
+    #         stiffness_graph.append(0)  # 초기값
 
-    average_stiffness=force_ori/(displacement_graph[0]-displacement_graph[i]) #최종 강성
+    # average_stiffness=force_ori/(displacement_graph[0]-displacement_graph[i]) #최종 강성
 
-    print("Avg Vertical stiffness: {}\n".format(average_stiffness))
+
+    last_frame_stiffness = force_ori / (displacement_graph[-1] - displacement_graph[0])
+    # print("Avg Vertical stiffness: {}\n".format(average_stiffness))
+    print("Last Frame Vertical stiffness: {}\n".format(last_frame_stiffness))
     
-    return average_stiffness
+    return last_frame_stiffness

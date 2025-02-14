@@ -48,7 +48,7 @@ for odb_name in odb_files:
     
     target_contact_area  = contact_area_extraction(odb_name)
     subrot_center_disp_gap, rot_center_disp_gap, total_ceter_disp_gap, total_center_disp_std, max_velocity_subrot, max_velocity_rot = tire_center_displacement_extraction(odb_name)
-    vertical_stiffness = vertical_stiffness_extraction(odb_name, instance_name)
+    vertical_stiffness = vertical_stiffness_extraction(odb_name, instance_name) # using last frame and first frame
     max_slip_angle, max_slip_distance, target_step_frame_list = slip_angle_dist_extraction(odb_name, instance_name)
     bending_moment = bending_moment_extraction(odb_name)
     torque_last_frame, max_torque = torque_extraction(odb_name)
@@ -69,7 +69,7 @@ for odb_name in odb_files:
     max_slip_angle_list.append(max_slip_angle)
     max_slip_distance_list.append(max_slip_distance)
     bending_moment_list.append(bending_moment)
-    torque_list.append(max_torque)
+    torque_list.append(torque_last_frame)
     subrot_center_disp_gap_list.append(subrot_center_disp_gap)
     rot_center_disp_gap_list.append(rot_center_disp_gap)
     total_cetner_disp_gap_list.append(total_ceter_disp_gap)
