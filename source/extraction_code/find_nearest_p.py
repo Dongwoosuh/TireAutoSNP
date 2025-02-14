@@ -4,14 +4,11 @@ import math
 import pdb
 
 
-def find_node_with_max_z(nodes, displacement_values):
+def find_node_with_min_y(nodes, displacement_values):
     min_x = float('inf')
-    min_z = float('inf')
-    max_z = float('-inf')
-    
+    min_y = float('inf')
     min_x_node = None
     min_y_node = None
-    max_z_node = None 
     for node in nodes:
         disp = displacement_values.get(node.label)
         if disp is None:
@@ -20,22 +17,19 @@ def find_node_with_max_z(nodes, displacement_values):
         try:
             x = node.coordinates[0] + disp.data[0]  #
             y = node.coordinates[1] + disp.data[1]  #
-            z = node.coordinates[2] + disp.data[2]  #
         except OdbError:  
             x = node.coordinates[0] + disp.dataDouble[0]
             y = node.coordinates[1] + disp.dataDouble[1]
-            z = node.coordinates[2] + disp.dataDouble[2]
-            
-        if x > 90 and y < -79.99 : 
         
-            if z > max_z:
-                max_z = z
-                max_z_node = node
+        if x > 90 : 
+            if y < min_y:
+                min_y = y
+                min_y_node = node
+                
         else: 
             continue
 
-    # pdb.set_trace()
-    return max_z_node
+    return min_y_node
 
 
 def find_closest_node(target_point, nodes, displacement_values):
