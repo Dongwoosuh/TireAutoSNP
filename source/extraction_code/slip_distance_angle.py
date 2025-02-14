@@ -179,7 +179,7 @@ def     slip_angle_dist_extraction(odb_name, instance_name):
 
     print("Max distance gap: {} at frame {}\n".format(max_slip_distance, max_dist_idx))
     
-    target_step_frame = [['subrotation', max_angle_index], ['rotation', max_dist_idx]]
+    target_step_frame = [['subrotation', max_angle_index-1], ['rotation', max_dist_idx-1]]
     
     return max_angle_difference, max_slip_distance, target_step_frame, subrot_stoptime, rot_stoptime, outlier_bool
 
@@ -267,7 +267,6 @@ def get_slip_dist(odb, step, myInstance, node_1, node_2):
         
         if current_node_1[1] > -79.99:
             contact_status = False
-            stop_time = new_frame.frameValue
         else: 
             contact_status = True
             
@@ -279,6 +278,7 @@ def get_slip_dist(odb, step, myInstance, node_1, node_2):
         
         if contact_status == False:
             current_node_1[1]
+            stop_time = new_frame.frameValue
             # print('stop frame:', frame, 'stop y:', current_node_1[1])   
             break
     
@@ -297,7 +297,7 @@ def get_angle_per_frame(odb, step, myInstance, node_1, node_2, contact_node):
     """Calculate the angle between two vectors in 3D space in SUB-ROTATION Step."""
     outlier_check =0
     outlier_exist = False
-    stop_time_ = 0
+    stop_time_ = None
     ## Calculate the vectors of nodes for the initial frame
     len_frames = len(step.frames)
     first_frame = step.frames[0]
@@ -356,13 +356,15 @@ def get_angle_per_frame(odb, step, myInstance, node_1, node_2, contact_node):
             if outlier_check == 0:
                 contact_status = False
                 outlier_exist =True
-                
-            contact_status = False
-            stop_time_ = new_frame.frameValue
+                # stop_time_ = new_frame.frameValue
+            else:
+                contact_status = False
         else: 
             contact_status = True
             outlier_check += 1
+            stop_time_ = new_frame.frameValue
             
+    
         current_angle_ba = calculate_angle_between_vectors(current_vector_ba, initial_vector_ba)
         abs_current_angle_ba = abs(current_angle_ba)   
         angles_list.append((frame, abs_current_angle_ba))
@@ -371,8 +373,9 @@ def get_angle_per_frame(odb, step, myInstance, node_1, node_2, contact_node):
         if contact_status == False:
             current_contact_node[1]
             # print('stop frame:', frame, 'stop y:', current_node_1[1])   
+            stop_time_ = new_frame.frameValue
+            
             break
-        
     # odb.close()
     return angles_list, stop_time_, outlier_exist
 
