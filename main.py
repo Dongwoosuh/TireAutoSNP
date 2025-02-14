@@ -43,13 +43,16 @@ total_center_disp_std_list = []
 max_velocity_subrot_list = []
 max_velocity_rot_list = []
 target_contact_area_list = []
+subrot_stoptime_list = []
+rot_stoptime_list = []
+
 for odb_name in odb_files:
     print("\n====================== Extracting data from {} ===========================".format(odb_name))
     
     target_contact_area  = contact_area_extraction(odb_name)
     subrot_center_disp_gap, rot_center_disp_gap, total_ceter_disp_gap, total_center_disp_std, max_velocity_subrot, max_velocity_rot = tire_center_displacement_extraction(odb_name)
     vertical_stiffness = vertical_stiffness_extraction(odb_name, instance_name) # using last frame and first frame
-    max_slip_angle, max_slip_distance, target_step_frame_list = slip_angle_dist_extraction(odb_name, instance_name)
+    max_slip_angle, max_slip_distance, target_step_frame_list, subrot_stoptime, rot_stoptime  = slip_angle_dist_extraction(odb_name, instance_name)
     bending_moment = bending_moment_extraction(odb_name)
     torque_last_frame, max_torque = torque_extraction(odb_name)
     contact_area_extraction(odb_name)
@@ -76,6 +79,9 @@ for odb_name in odb_files:
     total_center_disp_std_list.append(total_center_disp_std)
     max_velocity_subrot_list.append(max_velocity_subrot)
     max_velocity_rot_list.append(max_velocity_rot)
+    subrot_stoptime_list.append(subrot_stoptime)
+    rot_stoptime_list.append(rot_stoptime)
+    
     
     
     
@@ -97,8 +103,8 @@ for odb_name in odb_files:
     odb_base_name = os.path.basename(odb_name).replace(".odb", "")
     csv_file_name = os.path.basename(odb_name).replace(".odb", ".csv")
     csv_file_name = os.path.join('results','Total_results', csv_file_name)
-    headers = ["ODB Name", "Vertical Stiffness", "Max Slip Angle", "Max Slip Distance", "Bending Moment", "Torque", "Center Disp Gap(subrot)", "Center Disp Gap(rot)", "Total Center Disp Gap", "Total Center Disp Std", "Max Velocity(subrot)", "Max Velocity(rot)", "Target Contact Area"] 
-    values = [odb_base_name, vertical_stiffness, max_slip_angle, max_slip_distance, bending_moment, torque_last_frame, subrot_center_disp_gap, rot_center_disp_gap, total_ceter_disp_gap, total_center_disp_std, max_velocity_subrot, max_velocity_rot, target_contact_area]
+    headers = ["ODB Name", "Vertical Stiffness", "Max Slip Angle", "Max Slip Distance", "Bending Moment", "Torque", "Center Disp Gap(subrot)", "Center Disp Gap(rot)", "Total Center Disp Gap", "Total Center Disp Std", "Max Velocity(subrot)", "Max Velocity(rot)", "Target Contact Area", "Subrot Stop Time", "Rot Stop Time"] 
+    values = [odb_base_name, vertical_stiffness, max_slip_angle, max_slip_distance, bending_moment, torque_last_frame, subrot_center_disp_gap, rot_center_disp_gap, total_ceter_disp_gap, total_center_disp_std, max_velocity_subrot, max_velocity_rot, target_contact_area, subrot_stoptime, rot_stoptime]
 
     with open(csv_file_name, 'wb') as csvfile:
         writer = csv.writer(csvfile)
