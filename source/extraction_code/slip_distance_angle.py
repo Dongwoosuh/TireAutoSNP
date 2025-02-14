@@ -52,13 +52,14 @@ def     slip_angle_dist_extraction(odb_name, instance_name):
     # count the number of nodes in the instance
 
     # last frame (index len_frames - 1)
-    last_frame = step_bending.frames[len_frames -1]
+    # last_frame = step_bending.frames[len_frames -1]
+    last_frame = step_subrotation.frames[0]
     displacement_field_last = last_frame.fieldOutputs['U'].getSubset(region=myInstance)
 
     displacement_values_last = {value.nodeLabel: value for value in displacement_field_last.values}
 
     # the node with the minimum Y coordinate in the last frame (Node A)
-    min_y_node = find_node_with_min_y(myInstance.nodes, displacement_values_last)
+    min_y_node = find_node_with_max_z(myInstance.nodes, displacement_values_last)
     if min_y_node:
         node_a = min_y_node.label
 

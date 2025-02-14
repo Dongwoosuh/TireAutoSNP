@@ -130,7 +130,7 @@ Total_results_file = os.path.join('results', 'Total_results_all.csv')
 with open(Total_results_file, "wb") as csvfile:
     writer = csv.writer(csvfile)
     # writer.writerow (["ODB Name", "Max Velocity(subrot)", "Max Velocity(rot)"] )
-    # writer.writerow (["ODB Name", "Subrot Stop Time", "Rot Stop Time"] )
+    writer.writerow (["ODB Name", "Subrot Stop Time", "Rot Stop Time"] )
     # writer.writerow(["ODB Name", "Vertical Stiffness", "Max Slip Angle", "Max Slip Distance", "Bending Moment", "Torque", "Center Disp Gap(subrot)", "Center Disp Gap(rot)", "Total Center Disp Gap", "Total Center Disp Std", "Max Velocity(subrot)", "Max Velocity(rot)", "Target Contact Area", "Subrot Stop Time", "Rot Stop Time"])
     writer.writerow(["ODB Name", "Vertical Stiffness", "Max Slip Angle", "Max Slip Distance", "Bending Moment", "Torque", "Center Disp Gap(subrot)", "Center Disp Gap(rot)", "Total Center Disp Gap", "Total Center Disp Std", "Max Velocity(subrot)", "Max Velocity(rot)", "Target Contact Area", "Subrot Stop Time", "Rot Stop Time"])
   
