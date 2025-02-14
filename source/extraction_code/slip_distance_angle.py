@@ -353,7 +353,6 @@ def get_angle_per_frame(odb, step, myInstance, node_1, node_2, contact_node):
         else: 
             contact_status = True
             
-             
         current_angle_ba = calculate_angle_between_vectors(current_vector_ba, initial_vector_ba)
         abs_current_angle_ba = abs(current_angle_ba)   
         angles_list.append((frame, abs_current_angle_ba))
