@@ -52,8 +52,11 @@ for odb_name in odb_files:
     print("\n====================== Extracting data from {} ===========================".format(odb_name))
     
     max_slip_angle, max_slip_distance, target_step_frame_list, subrot_stoptime, rot_stoptime, outlier_bool  = slip_angle_dist_extraction(odb_name, instance_name)
+    
+    # do not save the data if outlier_bool is True
     if outlier_bool:
         continue
+    
     target_contact_area  = contact_area_extraction(odb_name)
     subrot_center_disp_gap, rot_center_disp_gap, total_ceter_disp_gap, total_center_disp_std, max_velocity_subrot, max_velocity_rot = tire_center_displacement_extraction(odb_name)
     avg_vertical_stiffness, last_vertical_stiffness, initial_vertical_stiffness = vertical_stiffness_extraction(odb_name, instance_name) # using last frame and first frame
