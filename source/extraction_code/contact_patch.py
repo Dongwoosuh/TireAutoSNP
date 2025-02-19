@@ -42,8 +42,8 @@ def contact_area_extraction(odb_name):
             carea_data = history_region.historyOutputs['CAREA    ASSEMBLY_TIRE/ASSEMBLY_GROUND'].data
             # Write CAREA data to CSV and print
             
-            if step_name == 'subrotation':
-                first_frame_contact_area  = carea_data[0][1]
+            if step_name == 'loading_300N':
+                first_frame_contact_area  = carea_data[-1][1]
                 for time, area in carea_data:
                     rot_carea_list.append(area)
                 max_rot_carea = np.max(rot_carea_list)

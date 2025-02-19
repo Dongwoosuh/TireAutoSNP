@@ -174,18 +174,20 @@ def     slip_angle_dist_extraction(odb_name, instance_name):
     if len(step_rotation.frames) == 0:
         max_slip_distance = 'No Rotation Step'
         idx = 'No Rotation Step'
+        target_step_frame = [['subrotation', max_angle_index-1]]
+        rot_stoptime = 'No Rotation Step'
     else:
         max_slip_distance, _, max_dist_idx, rot_stoptime,  = get_slip_dist(odb, step_rotation, myInstance, node_d, close_nodes_b)
 
-    print("Max distance gap: {} at frame {}\n".format(max_slip_distance, max_dist_idx))
-    
-    target_step_frame = [['subrotation', max_angle_index-1], ['rotation', max_dist_idx-1]]
+        print("Max distance gap: {} at frame {}\n".format(max_slip_distance, max_dist_idx))
+        
+        target_step_frame = [['subrotation', max_angle_index-1], ['rotation', max_dist_idx-1]]
     
     return max_angle_difference, max_slip_distance, target_step_frame, subrot_stoptime, rot_stoptime, outlier_bool
 
 def get_slip_dist(odb, step, myInstance, node_1, node_2):
     """Calculate the slip distance between two nodes in 3D space in ROTATION Step."""
-    
+    stop_time = "Value error"
     center2= odb.rootAssembly.nodeSets['TIRE_CENTER_2']
 
     len_frames = len(step.frames)
