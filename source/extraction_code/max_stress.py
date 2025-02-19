@@ -59,7 +59,7 @@ def max_stress_extraction(odb_name, instance_name, new_target_step_frame_list):
 
     for step_name, frame_num in target_step_frame:
         step = odb.steps[step_name]
-        
+
         stress_field = step.frames[frame_num].fieldOutputs['S'].getSubset(position = INTEGRATION_POINT, region = odb.rootAssembly.instances[instance_name])
         stress_value = stress_field.values
         

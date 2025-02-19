@@ -41,8 +41,7 @@ def tire_center_displacement_extraction(odb_name):
     prev_time = None
     prev_disp = None
     displcaement_graph_total = []
-    
-    
+
     for time_subrot, displacement_subrot in displacement_history_U_subrotation:
         time_graph_subrot.append(time_subrot)
         displacement_graph_subrot.append(displacement_subrot)
@@ -60,6 +59,12 @@ def tire_center_displacement_extraction(odb_name):
         prev_time = time_subrot
         prev_disp = displacement_subrot
         
+    max_disp_subrot = max(displacement_graph_subrot)
+    min_disp_subrot = min(displacement_graph_subrot)
+    subrot_gap = abs(max_disp_subrot - min_disp_subrot)
+    max_velocity_subrot = max([abs(velocity) for velocity in velocity_graph_subrot])
+        
+    
     
     time_rot_start = time_graph_subrot[-1]
     time_graph_rot =[]
@@ -68,48 +73,49 @@ def tire_center_displacement_extraction(odb_name):
     prve_time_ = None
     prev_disp_ = None
     
-    for time_rot, displacement_rot in displacement_history_U_rotation:
+    if len(step_rotation.frames) == 0:
+        max_disp_rot = None
+        min_disp_rot = None
+        rot_gap = None
+        max_velocity_rot = None
+    else:
+        for time_rot, displacement_rot in displacement_history_U_rotation:
+            
+            if time_rot > 0.0762:
+                break
+            time_graph_rot.append(time_rot)
+            time_graph_total.append(time_rot + time_rot_start)
+            displacement_graph_rot.append(displacement_rot)
+            displcaement_graph_total.append(displacement_rot)
+            
+            if prve_time_ is not None and prev_disp_ is not None:
+                velocity = (displacement_rot - prev_disp) / (time_rot - prev_time)
+                velocity_graph_rot.append(velocity)
+                velocity_graph_total.append(velocity)
+            else:
+                velocity_graph_rot.append(0)
+                velocity_graph_total.append(0)
+            
+            prve_time_ = time_rot
+            prev_disp_ = displacement_rot
         
-        if time_rot > 0.0762:
-            break
-        time_graph_rot.append(time_rot)
-        time_graph_total.append(time_rot + time_rot_start)
-        displacement_graph_rot.append(displacement_rot)
-        displcaement_graph_total.append(displacement_rot)
+
         
-        if prve_time_ is not None and prev_disp_ is not None:
-            velocity = (displacement_rot - prev_disp) / (time_rot - prev_time)
-            velocity_graph_rot.append(velocity)
-            velocity_graph_total.append(velocity)
-        else:
-            velocity_graph_rot.append(0)
-            velocity_graph_total.append(0)
-        
-        prve_time_ = time_rot
-        prev_disp_ = displacement_rot
-        
-    max_disp_subrot = max(displacement_graph_subrot)
-    min_disp_subrot = min(displacement_graph_subrot)
-    subrot_gap = abs(max_disp_subrot - min_disp_subrot)
+        max_disp_rot = max(displacement_graph_rot)
+        min_disp_rot = min(displacement_graph_rot)
+        rot_gap = abs(max_disp_rot - min_disp_rot)
+        max_velocity_rot = max(abs(velocity) for velocity in velocity_graph_rot)
     
-    max_disp_rot = max(displacement_graph_rot)
-    min_disp_rot = min(displacement_graph_rot)
-    rot_gap = abs(max_disp_rot - min_disp_rot)
-    
+    total_std = np.std(displcaement_graph_total)
     max_disp_total = max(displcaement_graph_total)
     min_disp_total = min(displcaement_graph_total)
     total_gap = abs(max_disp_total - min_disp_total)
-    
-    total_std = np.std(displcaement_graph_total)
-    
-    max_velocity_subrot = max([abs(velocity) for velocity in velocity_graph_subrot])
-    max_velocity_rot = max(abs(velocity) for velocity in velocity_graph_rot)
     
         # CSV output file
     odb_base_name = os.path.basename(odb_name).replace(".odb", "")
     csv_file_name = os.path.basename(odb_name).replace(".odb", ".csv")
     csv_path_name = os.path.join('results','Tire_center', csv_file_name)
-    
+        
     with open(csv_path_name, 'w') as csvfile:
         writer = csv.writer(csvfile, lineterminator='\n')
         writer.writerow(['Time', 'Total Displacement', 'Velocity'])

@@ -1,4 +1,5 @@
 from .contact_patch import contact_area_extraction
+from .contact_patch2 import contact_area_extraction2
 from .max_stress import max_stress_extraction
 from .vertical_stiffness import vertical_stiffness_extraction
 from .slip_distance_angle import slip_angle_dist_extraction

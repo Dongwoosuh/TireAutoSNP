@@ -53,6 +53,7 @@ def     slip_angle_dist_extraction(odb_name, instance_name):
 
     # last frame (index len_frames - 1)
     last_frame = step_bending.frames[len_frames -1]
+    
     displacement_field_last = last_frame.fieldOutputs['U'].getSubset(region=myInstance)
 
     displacement_values_last = {value.nodeLabel: value for value in displacement_field_last.values}
@@ -151,9 +152,9 @@ def     slip_angle_dist_extraction(odb_name, instance_name):
 
 
     # Get the angle difference between noce A, B
-    angleslist_ba = get_angle_per_frame(odb, step_subrotation, myInstance, node_a, close_nodes_b, contact_node=node_a)
+    angleslist_ba, subrot_stoptime, outlier_bool = get_angle_per_frame(odb, step_subrotation, myInstance, node_a, close_nodes_b, contact_node=node_a)
     # Get the angle difference between noce C, E
-    angleslist_ec = get_angle_per_frame(odb, step_subrotation, myInstance, node_c, close_nodes_e, contact_node=node_a)
+    angleslist_ec, _, _ = get_angle_per_frame(odb, step_subrotation, myInstance, node_c, close_nodes_e, contact_node=node_a)
     
     angle_differences = [abs(a[1] - b[1]) for a, b in zip(angleslist_ba, angleslist_ec)]
     
@@ -165,24 +166,28 @@ def     slip_angle_dist_extraction(odb_name, instance_name):
             max_angle_difference = angle_differences[i]
         else:
             break            
-    max_angle_index = angle_differences.index(max_angle_difference)
+    # max_angle_index = angle_differences.index(max_angle_difference)
+    max_angle_index = len(angle_differences)
     
     print("Max angle difference: {} at frame {}".format(max_angle_difference, max_angle_index))
     
     if len(step_rotation.frames) == 0:
         max_slip_distance = 'No Rotation Step'
         idx = 'No Rotation Step'
+        target_step_frame = [['subrotation', max_angle_index-1]]
+        rot_stoptime = 'No Rotation Step'
     else:
-        max_slip_distance, _, max_dist_idx = get_slip_dist(odb, step_rotation, myInstance, node_d, close_nodes_b)
+        max_slip_distance, _, max_dist_idx, rot_stoptime,  = get_slip_dist(odb, step_rotation, myInstance, node_d, close_nodes_b)
 
-    print("Max distance gap: {} at frame {}\n".format(max_slip_distance, max_dist_idx))
+        print("Max distance gap: {} at frame {}\n".format(max_slip_distance, max_dist_idx))
+        
+        target_step_frame = [['subrotation', max_angle_index-1], ['rotation', max_dist_idx-1]]
     
-    target_step_frame = [['subrotation', max_angle_index], ['rotation', max_dist_idx]]
-    return max_angle_difference, max_slip_distance, target_step_frame
+    return max_angle_difference, max_slip_distance, target_step_frame, subrot_stoptime, rot_stoptime, outlier_bool
 
 def get_slip_dist(odb, step, myInstance, node_1, node_2):
     """Calculate the slip distance between two nodes in 3D space in ROTATION Step."""
-    
+    stop_time = "Value error"
     center2= odb.rootAssembly.nodeSets['TIRE_CENTER_2']
 
     len_frames = len(step.frames)
@@ -262,7 +267,7 @@ def get_slip_dist(odb, step, myInstance, node_1, node_2):
         current_vector_ba = [current_node_1[i] - center2_current_coords[i] for i in range(3)]
         current_vector_ca = [current_node_2[i] - center2_current_coords[i] for i in range(3)]
         
-        if current_node_1[1] > -79.9:
+        if current_node_1[1] > -79.99:
             contact_status = False
         else: 
             contact_status = True
@@ -275,6 +280,7 @@ def get_slip_dist(odb, step, myInstance, node_1, node_2):
         
         if contact_status == False:
             current_node_1[1]
+            stop_time = new_frame.frameValue
             # print('stop frame:', frame, 'stop y:', current_node_1[1])   
             break
     
@@ -282,15 +288,18 @@ def get_slip_dist(odb, step, myInstance, node_1, node_2):
     abs_angle_differences = [abs(diff_angle) for frame_value, curr_angle_ba, current_angle_ca, diff_angle in angle_differences]
     # return max_slip_angle, max_distance_gap
     max_slip_angle = max(abs_angle_differences)
-    index = abs_angle_differences.index(max_slip_angle)
     max_slip_dist = math.radians(max_slip_angle) * 150
     
+    # index1 = abs_angle_differences.index(max_slip_angle)
+    index = len(angle_differences)
     # odb.close()
-    return max_slip_dist, max_slip_angle, index
+    return max_slip_dist, max_slip_angle, index, stop_time
 
 def get_angle_per_frame(odb, step, myInstance, node_1, node_2, contact_node):
     """Calculate the angle between two vectors in 3D space in SUB-ROTATION Step."""
-    
+    outlier_check =0
+    outlier_exist = False
+    stop_time_ = None
     ## Calculate the vectors of nodes for the initial frame
     len_frames = len(step.frames)
     first_frame = step.frames[0]
@@ -345,13 +354,19 @@ def get_angle_per_frame(odb, step, myInstance, node_1, node_2, contact_node):
         current_vector_ba = [current_node_1[i] - current_node_2[i] for i in range(3)]
         
         ## Calculate the frame where the contact stopped, that is why we need "contact_node"
-        if current_contact_node[1] > -79.9:
-            contact_status = False
-            stop_frame = frame
+        if current_contact_node[1] > -79.99:
+            if outlier_check == 0:
+                contact_status = False
+                outlier_exist =True
+                # stop_time_ = new_frame.frameValue
+            else:
+                contact_status = False
         else: 
             contact_status = True
+            outlier_check += 1
+            stop_time_ = new_frame.frameValue
             
-             
+    
         current_angle_ba = calculate_angle_between_vectors(current_vector_ba, initial_vector_ba)
         abs_current_angle_ba = abs(current_angle_ba)   
         angles_list.append((frame, abs_current_angle_ba))
@@ -360,10 +375,11 @@ def get_angle_per_frame(odb, step, myInstance, node_1, node_2, contact_node):
         if contact_status == False:
             current_contact_node[1]
             # print('stop frame:', frame, 'stop y:', current_node_1[1])   
+            stop_time_ = new_frame.frameValue
+            
             break
-        
     # odb.close()
-    return angles_list
+    return angles_list, stop_time_, outlier_exist
 
 def calculate_angle_between_vectors(v1, v2):
     """Calculate the angle between two vectors in 3D space."""
