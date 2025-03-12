@@ -45,18 +45,17 @@ output_data = output_dataset.iloc[:, 1:].values # 오른쪽 하나
 # output_test_data = test_dataset.iloc[:, -1].values.reshape(-1, 1)
 
 input_data, input_test_data, output_data, output_test_data = train_test_split(input_data, output_data, test_size=0.1, random_state=SEED)
-
 # 모델 설정 -------------------------------------------------------------------
 batch_size = 32
 num_layers = 2
-node_num = 24
-dropout_rate = 0.29993927967790496
-hidden_activation = "ELU"
+node_num = 49
+dropout_rate = 0.11790712711864053
+hidden_activation = "ReLU"
 output_activation = "Sigmoid"
-lr = 0.005531931628790238
+lr = 0.0876507991688041
 n_epochs = 1000
 bestmodel_epoch = 5000
-kf = KFold(n_splits=4, shuffle=True, random_state=SEED)
+kf = KFold(n_splits=5, shuffle=True, random_state=SEED)
 
 # 데이터 정규화
 input_scaler = MinMaxScaler()

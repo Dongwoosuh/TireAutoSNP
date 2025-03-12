@@ -122,34 +122,50 @@ for odb_name in odb_files:
 
     
 
-Total_results_file = os.path.join('results', 'Total_results_all.csv')
-with open(Total_results_file, "wb") as csvfile:
-    writer = csv.writer(csvfile)
-    # writer.writerow (["ODB Name", "Vertical Stiffness"] )
-    # writer.writerow (["ODB Name", "Vertical Stiffness", "Subrot Stop Time", "Rot Stop Time"] )
-    # writer.writerow(["ODB Name", "Vertical Stiffness", "Max Slip Angle", "Max Slip Distance", "Bending Moment", "Torque", "Center Disp Gap(subrot)", "Center Disp Gap(rot)", "Total Center Disp Gap", "Total Center Disp Std", "Max Velocity(subrot)", "Max Velocity(rot)", "Target Contact Area", "Subrot Stop Time", "Rot Stop Time"])
-    writer.writerow(["ODB Name", "Vertical Stiffness", "Max Slip Angle", "Max Slip Distance", "Bending Moment", "Torque", "Center Disp Gap(subrot)", "Center Disp Gap(rot)", "Total Center Disp Gap", "Total Center Disp Std", "Max Velocity(subrot)", "Max Velocity(rot)", "Target Contact Area", "Subrot Stop Time", "Rot Stop Time", "Max Rot Contact Area"])
+    Total_results_file = os.path.join('results', 'Total_results_all.csv')
+    with open(Total_results_file, "wb") as csvfile:
+        writer = csv.writer(csvfile)
+        # writer.writerow (["ODB Name", "Vertical Stiffness"] )
+        # writer.writerow (["ODB Name", "Vertical Stiffness", "Subrot Stop Time", "Rot Stop Time"] )
+        # writer.writerow(["ODB Name", "Vertical Stiffness", "Max Slip Angle", "Max Slip Distance", "Bending Moment", "Torque", "Center Disp Gap(subrot)", "Center Disp Gap(rot)", "Total Center Disp Gap", "Total Center Disp Std", "Max Velocity(subrot)", "Max Velocity(rot)", "Target Contact Area", "Subrot Stop Time", "Rot Stop Time"])
+        writer.writerow(["ODB Name",
+                        "Vertical Stiffness",
+                        "Max Slip Angle", 
+                        "Max Slip Distance",
+                        "Bending Moment", 
+                        "Torque", 
+                        "Center Disp Gap(subrot)",
+                        "Center Disp Gap(rot)",
+                        "Total Center Disp Gap", 
+                        "Total Center Disp Std", 
+                        "Max Velocity(subrot)",
+                        "Max Velocity(rot)",
+                        "Target Contact Area", 
+                        "Subrot Stop Time", 
+                        "Rot Stop Time", 
+                        "Max Rot Contact Area"])
 
-    for i in range(len(odb_name_list)):
-        writer.writerow([
-            odb_name_list[i],
-            # avg_vertical_stiffness_list[i],
-            # last_vertical_stiffness_list[i],
-            # initial_vertical_stiffness_list[i],
-            displacement_last_frame_list[i],
-            max_slip_angle_list[i],
-            max_slip_distance_list[i],
-            bending_moment_list[i],
-            torque_list[i],
-            subrot_center_disp_gap_list[i],
-            rot_center_disp_gap_list[i],
-            total_cetner_disp_gap_list[i],
-            total_center_disp_std_list[i],
-            max_velocity_subrot_list[i],
-            max_velocity_rot_list[i],
-            target_contact_area_list[i],
-            subrot_stoptime_list[i],
-            rot_stoptime_list[i],
-            max_rot_carea_list[i]
-            ])
+        for i in range(len(odb_name_list)):
+            writer.writerow([
+                odb_name_list[i],
+                # avg_vertical_stiffness_list[i],
+                # last_vertical_stiffness_list[i],
+                # initial_vertical_stiffness_list[i],
+                displacement_last_frame_list[i],
+                max_slip_angle_list[i],
+                max_slip_distance_list[i],
+                bending_moment_list[i],
+                torque_list[i],
+                subrot_center_disp_gap_list[i],
+                rot_center_disp_gap_list[i],
+                total_cetner_disp_gap_list[i],
+                total_center_disp_std_list[i],
+                max_velocity_subrot_list[i],
+                max_velocity_rot_list[i],
+                target_contact_area_list[i],
+                subrot_stoptime_list[i],
+                rot_stoptime_list[i],
+                max_rot_carea_list[i]
+                ])
+        
 

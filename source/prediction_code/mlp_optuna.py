@@ -32,7 +32,7 @@ else:
 print("Current device: ", device)
 
 # seed -----------------------------------------------------------------------
-SEED = 2024
+SEED = 2025
 np.random.seed(SEED)
 network = "MLP"
 # data path -------------------------------------------------------------------
@@ -51,13 +51,13 @@ output_data = output_dataset.iloc[:, 1:].values # 오른쪽 하나
 # input_test_data = test_dataset.iloc[:, :-1].values
 # output_test_data = test_dataset.iloc[:, -1].values.reshape(-1, 1)
 
-input_data, input_test_data, output_data, output_test_data = train_test_split(input_data, output_data, test_size=0.2, random_state=SEED)
+input_data, input_test_data, output_data, output_test_data = train_test_split(input_data, output_data, test_size=0.1, random_state=SEED)
 
 # 모델 설정 -------------------------------------------------------------------
 trials = 500
 train_epoch = 1000
 bestmodel_epoch = 3000
-kf = KFold(n_splits=4, shuffle=True, random_state=SEED)
+kf = KFold(n_splits=5, shuffle=True, random_state=SEED)
 
 # 데이터 정규화
 input_scaler = MinMaxScaler()
@@ -76,13 +76,13 @@ output_test_data = output_test_data.astype(np.float32)
 def objective(trial: Trial):
     # 하이퍼파라미터의 범위를 지정
     param = {
-        "lr": trial.suggest_float("lr", 1e-5, 1e-1),
-        "hidden_size": trial.suggest_int("hidden_size", 16, 512),
+        "lr": trial.suggest_float("lr", 1e-4, 1e-2),
+        "hidden_size": trial.suggest_int("hidden_size", 16, 256),
         "num_layers": trial.suggest_int("num_layers", 1, 5),
         "batch_size": trial.suggest_categorical("batch_size", [8, 16, 32]),
         "dropout_rate": trial.suggest_float("dropout_rate", 0.0, 0.3),
         "hidden_activation": trial.suggest_categorical(
-            "hidden_activation", ["ReLU", "SiLU", "LeakyReLU", "ELU"]
+            "hidden_activation", ["ReLU", "SiLU", "LeakyReLU"]
         ),
         "output_activation": trial.suggest_categorical(
             "output_activation", ["Sigmoid"]

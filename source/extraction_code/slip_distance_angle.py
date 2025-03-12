@@ -152,20 +152,28 @@ def     slip_angle_dist_extraction(odb_name, instance_name):
 
 
     # Get the angle difference between noce A, B
-    angleslist_ba, subrot_stoptime, outlier_bool = get_angle_per_frame(odb, step_subrotation, myInstance, node_a, close_nodes_b, contact_node=node_a)
+    angleslist_ba, subrot_stoptime, outlier_bool, time_list = get_angle_per_frame(odb, step_subrotation, myInstance, node_a, close_nodes_b, contact_node=node_a)
     # Get the angle difference between noce C, E
-    angleslist_ec, _, _ = get_angle_per_frame(odb, step_subrotation, myInstance, node_c, close_nodes_e, contact_node=node_a)
-    
+    ###### not used
+    angleslist_ec, _, _, _ = get_angle_per_frame(odb, step_subrotation, myInstance, node_c, close_nodes_e, contact_node=node_a)
     angle_differences = [abs(a[1] - b[1]) for a, b in zip(angleslist_ba, angleslist_ec)]
+    print(angle_differences)
+    ######
+    velocity_of_subrot = 4.63
+    angleslist_ec = [math.degrees(velocity_of_subrot*time) for time in time_list]
+    
+    angle_differences = [abs(a[1] - b) for a, b in zip(angleslist_ba, angleslist_ec)]
     
     print(angle_differences)
-    max_angle_difference = angle_differences[0]
+    max_angle_difference = max(angle_differences)
+    max_angle_index = angle_differences.index(max_angle_difference)
+    # max_angle_difference = angle_differences[0]
     
-    for i in range(1, len(angle_differences)): 
-        if angle_differences[i] > max_angle_difference:
-            max_angle_difference = angle_differences[i]
-        else:
-            break            
+    # for i in range(1, len(angle_differences)): 
+    #     if angle_differences[i] > max_angle_difference:
+    #         max_angle_difference = angle_differences[i]
+    #     else:
+    #         break            
     # max_angle_index = angle_differences.index(max_angle_difference)
     max_angle_index = len(angle_differences)
     
@@ -323,6 +331,7 @@ def get_angle_per_frame(odb, step, myInstance, node_1, node_2, contact_node):
     
     ## Calculate the vectors of nodes for each frame
     angles_list = []
+    time_list = []
     contact_status = True
     for i in range(len_frames):
         frame = i
@@ -370,7 +379,7 @@ def get_angle_per_frame(odb, step, myInstance, node_1, node_2, contact_node):
         current_angle_ba = calculate_angle_between_vectors(current_vector_ba, initial_vector_ba)
         abs_current_angle_ba = abs(current_angle_ba)   
         angles_list.append((frame, abs_current_angle_ba))
-        
+        time_list.append(new_frame.frameValue)
         
         if contact_status == False:
             current_contact_node[1]
@@ -379,7 +388,7 @@ def get_angle_per_frame(odb, step, myInstance, node_1, node_2, contact_node):
             
             break
     # odb.close()
-    return angles_list, stop_time_, outlier_exist
+    return angles_list, stop_time_, outlier_exist, time_list
 
 def calculate_angle_between_vectors(v1, v2):
     """Calculate the angle between two vectors in 3D space."""

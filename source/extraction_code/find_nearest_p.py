@@ -55,7 +55,7 @@ def find_closest_node(target_point, nodes, displacement_values):
             closest_node = node
     return closest_node
 
-def find_nodes_within_tolerance(target_point, nodes, displacement_values, tolerance=3.3):
+def find_nodes_within_tolerance(target_point, nodes, displacement_values, tolerance=3.1):
 
     close_nodes = []
     close_nodes_coords = []

@@ -85,5 +85,5 @@ def combine_target_carea():
 
 if __name__ == '__main__':
     combine_max_stress()
-    combine_max_velocity()
-    combine_target_carea()
+    # combine_max_velocity()
+    # combine_target_carea()
