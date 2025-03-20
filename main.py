@@ -19,7 +19,7 @@ for subfolder in required_subfolders:
 
         
 
-odb_folder_path = './omniwheel_ref'
+odb_folder_path = './omniwheel_ref/new_250320'
 odb_files = [
     os.path.join(odb_folder_path, file)
     for file in os.listdir(odb_folder_path)
@@ -90,21 +90,6 @@ for odb_name in odb_files:
     rot_stoptime_list.append(rot_stoptime)
     max_rot_carea_list.append(max_rot_carea)
     
-    
-    
-    # write csv for sungneung yoso
-    # odb_base_name = os.path.basename(odb_name).replace(".odb", "")
-    # csv_file_name = os.path.basename(odb_name).replace(".odb", ".csv")
-    # csv_file_name = os.path.join('results','Tire_center', csv_file_name)
-    # headers = ["ODB Name", "Center Disp Gap(subrot)", "Center Disp Gap(rot)", "Total Center Disp Gap", "Total Center Disp Std"] 
-    # values = [odb_base_name, subrot_center_disp_gap, rot_center_disp_gap, total_ceter_disp_gap, total_center_disp_std]
-
-    # with open(csv_file_name, 'wb') as csvfile:
-    #     writer = csv.writer(csvfile)
-    #     writer.writerow(headers)
-    #     writer.writerow(values)
-
-    # print("======================== Data extraction and file creation completed. ===========================\n")
     
     # write csv for sungneung yoso
     odb_base_name = os.path.basename(odb_name).replace(".odb", "")

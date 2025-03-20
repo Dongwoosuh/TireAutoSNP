@@ -55,7 +55,7 @@ def find_closest_node(target_point, nodes, displacement_values):
             closest_node = node
     return closest_node
 
-def find_nodes_within_tolerance(target_point, nodes, displacement_values, tolerance=3.1):
+def find_nodes_within_tolerance(target_point, nodes, displacement_values, tolerance=3.05):
 
     close_nodes = []
     close_nodes_coords = []
@@ -76,8 +76,10 @@ def find_nodes_within_tolerance(target_point, nodes, displacement_values, tolera
                              (y - target_point[1])**2 + 
                              (z - target_point[2])**2)
         if distance < tolerance:
+            # if x/target_point[0] > 0.99 and x/target_point[0] < 1.01:
             close_nodes.append(node.label)
             close_nodes_coords.append((x, y, z))    
+                
     return close_nodes , close_nodes_coords
 
 def calculate_midpoint_by_nodes(node_coords):

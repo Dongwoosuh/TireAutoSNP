@@ -9,38 +9,29 @@ from find_nearest_p import *
 
 __all__ = ['slip_angle_dist_extraction']    
 
+def load_step(odb, step_name):
+    try:
+        step = odb.steps[step_name]
+    except KeyError:
+        print("Error: No step named", step_name)
+        odb.close()
+        sys.exit()
+    return step
+
 def     slip_angle_dist_extraction(odb_name, instance_name):
     print("...Slip Angle and Distance Extraction...")
+    
     try:
         odb = openOdb(path=odb_name, readOnly=True)
     except OdbError as e:
         print("No ODB")
         exit()
 
-
-    try:
-        step_bending = odb.steps['bending']
-    except KeyError:
-        print("Error: No bending")
-        odb.close()
-        exit()
-
+    step_bending = load_step(odb, 'bending')
+    step_subrotation = load_step(odb, 'subrotation')
+    step_rotation = load_step(odb, 'rotation')
+    
     len_frames = len(step_bending.frames)
-
-    try:
-        step_subrotation = odb.steps['subrotation']
-    except KeyError:
-        print("Error: No subrotation")
-        odb.close()
-        sys.exit()
-
-    try:
-        step_rotation = odb.steps['rotation']
-    except KeyError:
-        print("Error: No subrotation")
-        odb.close()
-        sys.exit()
-
 
     try:
         myInstance = odb.rootAssembly.instances[instance_name]
@@ -96,7 +87,7 @@ def     slip_angle_dist_extraction(odb_name, instance_name):
     close_nodes_b, close_nodes_b_coords = find_nodes_within_tolerance(target_point, myInstance.nodes, displacement_values_initial)
 
     node_b_coords = calculate_midpoint_by_nodes(close_nodes_b_coords)
-
+    
 
     # the node with the minimum Y coordinate among the nodes with the minimum X coordinate in the initial frame (Node C)
     min_x_nodes = find_nodes_with_min_x(myInstance.nodes, displacement_values_initial)
@@ -159,7 +150,7 @@ def     slip_angle_dist_extraction(odb_name, instance_name):
     angle_differences = [abs(a[1] - b[1]) for a, b in zip(angleslist_ba, angleslist_ec)]
     print(angle_differences)
     ######
-    velocity_of_subrot = 4.63
+    velocity_of_subrot = 4.63*2
     angleslist_ec = [math.degrees(velocity_of_subrot*time) for time in time_list]
     
     angle_differences = [abs(a[1] - b) for a, b in zip(angleslist_ba, angleslist_ec)]
@@ -167,6 +158,8 @@ def     slip_angle_dist_extraction(odb_name, instance_name):
     print(angle_differences)
     max_angle_difference = max(angle_differences)
     max_angle_index = angle_differences.index(max_angle_difference)
+    
+    #### The way to find the max angle difference with the first PEAK frame
     # max_angle_difference = angle_differences[0]
     
     # for i in range(1, len(angle_differences)): 
@@ -175,10 +168,11 @@ def     slip_angle_dist_extraction(odb_name, instance_name):
     #     else:
     #         break            
     # max_angle_index = angle_differences.index(max_angle_difference)
-    max_angle_index = len(angle_differences)
     
     print("Max angle difference: {} at frame {}".format(max_angle_difference, max_angle_index))
     
+    
+    # Get the slip distance between node D and node B
     if len(step_rotation.frames) == 0:
         max_slip_distance = 'No Rotation Step'
         idx = 'No Rotation Step'
