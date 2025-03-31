@@ -3,7 +3,7 @@ import os
 import csv
 import pdb
 from odbAccess import *
-
+from find_nearest_p import find_node_with_min_y
 __all__ = ['vertical_stiffness_extraction'] 
 
 def vertical_stiffness_extraction(odb_name, instance_name, graph_plot=False):
@@ -13,20 +13,65 @@ def vertical_stiffness_extraction(odb_name, instance_name, graph_plot=False):
     time_graph_loading_300 = []
     displacement_loading_graph = []
     displacement_loading_300_graph = []
-    force_loading_graph = []
+    tire_center_displacement_graph = []
     force_graph = []
     stiffness_graph = []
 
     # temp
     displacement_diff_graph = []
     force_diff_graph = []
-    
+        
     # Open the odb file
     odb = openOdb(path=odb_name)
+    
+    try:
+        myInstance = odb.rootAssembly.instances[instance_name]
+    except KeyError:
+        print("Error: No instance")
+        odb.close()
+        exit()
+        
     step_loading = odb.steps['loading'] 
     step_loading_300 = odb.steps['loading_300N'] 
+    step_bending = odb.steps['bending']
     
-    supporter_name = 'SUPPORTER_CENTER'
+    len_frames = len(step_bending.frames)
+    last_frame = step_bending.frames[len_frames -1]
+    
+    displacement_field_last = last_frame.fieldOutputs['U'].getSubset(region=myInstance)
+
+    displacement_values_last = {value.nodeLabel: value for value in displacement_field_last.values}
+
+    # the node with the minimum Y coordinate in the last frame (Node A)
+    min_y_node = find_node_with_min_y(myInstance.nodes, displacement_values_last)
+    if min_y_node:
+        node_a = min_y_node.label
+
+    else:
+        print("Error: Could not find node with minimum Y in last frame.")
+        odb.close()
+        exit()
+        
+    # inintial frame (index 0)
+    for i in range(len(step_loading.frames)):
+        frame_data = step_loading.frames[i]
+        displacement_field = frame_data.fieldOutputs['U'].getSubset(region=myInstance)
+        displacement_values = {value.nodeLabel: value for value in displacement_field.values}
+        node_a_disp = displacement_values.get(node_a)
+        
+        node_a_coord_x = min_y_node.coordinates[0] + node_a_disp.data[0]
+        node_a_coord_y = min_y_node.coordinates[1] + node_a_disp.data[1]
+        node_a_coord_z = min_y_node.coordinates[2] + node_a_disp.data[2]
+        
+        if node_a_coord_y < -79.99:
+            inintial_time = frame_data.frameValue
+            inintial_frame = frame_data
+            break
+    
+    pdb.set_trace()    
+    
+    
+    supporter_name = 'TIRE_CENTER_2'
     supporter_node_set = odb.rootAssembly.nodeSets[supporter_name]
 
     assembly_node_label = supporter_node_set.nodes[0][0].label
@@ -44,22 +89,23 @@ def vertical_stiffness_extraction(odb_name, instance_name, graph_plot=False):
     force_history_loading = history_region_loading.historyOutputs['RF2'].data  # 'U2' 기입
     
     idx = 0
-    for time, force_loading in force_history_loading:
+    for time, tire_center_displacement in displacement_history_U_loading:
         time_graph_loading.append(time)
-        force_loading_graph.append(force_loading)
-        displacement_loading_graph.append(displacement_history_U_loading[idx][1])
-        idx += 1
+        tire_center_displacement_graph.append(tire_center_displacement)
         
-    for idx in range(len(force_loading_graph) - 1, -1, -1):
-        if abs(force_loading_graph[idx]) < 0.001:
-            initial_u2 = displacement_loading_graph[idx]
+        if round(time, 4) == round(inintial_time, 4):
+            initial_u2 = tire_center_displacement_graph[idx]
+            # print("Initial U2: ", initial_u2)
             break
-        
-        
+        else:
+            idx += 1
+            
+            
     try:
         history_region = step_loading_300.historyRegions[node_name]  # Node PartName.nodenum
     except KeyError:
         print("History region 'Node ASSEMBLY.4' not found in odb file: {}".format(odb_name))
+   
    
     # Extract displacement data (U2 in this case)
     displacement_history_U = history_region.historyOutputs['U2'].data  # 'U2' 기입
