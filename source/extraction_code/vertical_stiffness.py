@@ -51,7 +51,7 @@ def vertical_stiffness_extraction(odb_name, instance_name, graph_plot=False):
         idx += 1
         
     for idx in range(len(force_loading_graph) - 1, -1, -1):
-        if abs(force_loading_graph[idx]) < 0.3:
+        if abs(force_loading_graph[idx]) < 0.001:
             initial_u2 = displacement_loading_graph[idx]
             break
         
