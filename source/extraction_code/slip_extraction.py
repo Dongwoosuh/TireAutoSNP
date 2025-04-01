@@ -59,7 +59,7 @@ def slip_angle_extraction(odb_name, instance_name):
         subrot_original_distance = velocity_of_subrot * time
         subrot_ori_dist_list.append(subrot_original_distance)
         # subrot_gap = math.degrees(abs(value/30 - subrot_original_distance))
-        subrot_gap = math.degrees(abs(value - subrot_original_distance*30))
+        subrot_gap = abs(value - subrot_original_distance*30)
         subrot_gap_list.append(subrot_gap)
 
         if prev_subrot_gap is not None and subrot_gap < prev_subrot_gap:
@@ -72,9 +72,7 @@ def slip_angle_extraction(odb_name, instance_name):
     max_angle_difference = max(subrot_gap_list)
     max_angle_index = subrot_gap_list.index(max_angle_difference)
     subrot_stop_time = time_list[max_angle_index]
-    
     print("Max angle difference: {} at frame {}".format(max_angle_difference, max_angle_index))
-    
     return max_angle_difference, subrot_stop_time, max_angle_index
     
     

@@ -25,13 +25,41 @@ def max_stress_extraction(odb_name, instance_name, new_target_step_frame_list):
         print("Error: No bending")
         odb.close()
         exit()
-
+        
+    try:
+        step_subrotation = odb.steps['subrotation']
+        subrotation_time = [frame.frameValue for frame in step_subrotation.frames]
+    except KeyError:
+        print("Error: No subrotation")
+        odb.close()
+        exit()
+        
+    try:
+        step_rotation = odb.steps['rotation']
+        rotation_time = [frame.frameValue for frame in step_rotation.frames]
+    except KeyError:    
+        print("Error: No rotation")
+        odb.close()
+        exit()
+        
+    for i in new_target_step_frame_list:
+        if i[0] == 'subrotation':
+            for j in range(len(subrotation_time)):
+                if subrotation_time[j] > i[1]:
+                    subrotation_frame = j-1
+                    break
+                
+        elif i[0] == 'rotation':
+            for j in range(len(rotation_time)):
+                if rotation_time[j] > i[1]:
+                    rotation_frame = j-1
+                    break
+                
     len_loading_frames = len(step_loading.frames)
     
-    target_step_frame = [['bending', len_bending_frames-1 ], ['loading_300N', len_loading_frames-1]]
-    
-    for new_target_step_frame in new_target_step_frame_list:
-        target_step_frame.append(new_target_step_frame)
+    target_step_frame = [['bending', len_bending_frames-1 ], ['loading_300N', len_loading_frames-1], ['subrotation', subrotation_frame], ['rotation', rotation_frame]]
+    # for new_target_step_frame in new_target_step_frame_list:
+    #     target_step_frame.append(new_target_step_frame)
         
     # Change variables
     # 1. Change odb_name
