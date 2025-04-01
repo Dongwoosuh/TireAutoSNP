@@ -61,7 +61,8 @@ for odb_name in odb_files:
     # if outlier_bool:
     #     continue
     
-    target_step_frame_list = [['subrotation', max_angle_index-1], ['rotation', max_dist_idx-1]]
+    target_step_frame_list = [['subrotation', subrot_stoptime], ['rotation', rot_stoptime]]
+    max_stress_extraction(odb_name, instance_name, target_step_frame_list)
     
     displacement_last_frame = vertical_stiffness_extraction(odb_name, instance_name) # using last frame and first frame
     target_contact_area_, max_rot_carea  = contact_area_extraction(odb_name)
@@ -71,7 +72,6 @@ for odb_name in odb_files:
     contact_area_extraction(odb_name)
     target_contact_area = contact_area_mean_extraction(odb_name)
     
-    max_stress_extraction(odb_name, instance_name, target_step_frame_list)
 
     ## CSV output file
     odb_base_name = os.path.basename(odb_name).replace(".odb", "")
@@ -79,7 +79,7 @@ for odb_name in odb_files:
     
     
     target_contact_area_list.append(target_contact_area)    
-    # displacement_last_frame_list.append(displacement_last_frame)
+    displacement_last_frame_list.append(displacement_last_frame)
     max_slip_angle_list.append(max_slip_angle)
     max_slip_distance_list.append(max_slip_distance)
     bending_moment_list.append(bending_moment)
@@ -100,7 +100,7 @@ for odb_name in odb_files:
     csv_file_name = os.path.basename(odb_name).replace(".odb", ".csv")
     csv_file_name = os.path.join('results','Total_results', csv_file_name)
     headers = ["ODB Name", 
-            #    "Vertical Stiffness",
+               "Vertical Stiffness",
                "Max Slip Angle",
                "Max Slip Distance",
                "Bending Moment",
@@ -116,7 +116,7 @@ for odb_name in odb_files:
                "Rot Stop Time",
                "Max Rot Contact Area"] 
     values = [odb_base_name, 
-            #   displacement_last_frame,
+              displacement_last_frame,
               max_slip_angle, 
               max_slip_distance, 
               bending_moment, 
