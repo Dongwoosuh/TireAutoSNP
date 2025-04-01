@@ -19,7 +19,7 @@ for subfolder in required_subfolders:
 
         
 
-odb_folder_path = './omniwheel_ref/new_250320'
+odb_folder_path = './omniwheel_ref'
 odb_files = [
     os.path.join(odb_folder_path, file)
     for file in os.listdir(odb_folder_path)
@@ -59,15 +59,14 @@ for odb_name in odb_files:
     if outlier_bool:
         continue
     displacement_last_frame = vertical_stiffness_extraction(odb_name, instance_name) # using last frame and first frame
-    target_contact_area, max_rot_carea  = contact_area_extraction(odb_name)
+    target_contact_area_, max_rot_carea  = contact_area_extraction(odb_name)
     subrot_center_disp_gap, rot_center_disp_gap, total_ceter_disp_gap, total_center_disp_std, max_velocity_subrot, max_velocity_rot = tire_center_displacement_extraction(odb_name)
     bending_moment = bending_moment_extraction(odb_name)
     torque_last_frame, max_torque = torque_extraction(odb_name)
     contact_area_extraction(odb_name)
-    
+    target_contact_area = contact_area_mean_extraction(odb_name)
     
     max_stress_extraction(odb_name, instance_name, target_step_frame_list)
-
 
     ## CSV output file
     odb_base_name = os.path.basename(odb_name).replace(".odb", "")

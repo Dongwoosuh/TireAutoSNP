@@ -68,8 +68,6 @@ def vertical_stiffness_extraction(odb_name, instance_name, graph_plot=False):
             inintial_frame = frame_data
             break
     
-    pdb.set_trace()    
-    
     
     supporter_name = 'TIRE_CENTER_2'
     supporter_node_set = odb.rootAssembly.nodeSets[supporter_name]

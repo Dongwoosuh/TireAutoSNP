@@ -4,9 +4,9 @@ import csv
 import pdb
 from odbAccess import *
 
-__all__ = ['contact_area_extraction2']
+__all__ = ['contact_area_mean_extraction']
 
-def contact_area_extraction2(odb_name):
+def contact_area_mean_extraction(odb_name):
     print("...Contact Area Extraction...")
 # CSV output file
     first_frame_contact_area = None
