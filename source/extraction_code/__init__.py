@@ -6,3 +6,4 @@ from .slip_distance_angle import slip_angle_dist_extraction
 from .bending_moment import bending_moment_extraction
 from .torque import torque_extraction
 from .tire_center import tire_center_displacement_extraction
+from .slip_extraction import slip_distance_extraction, slip_angle_extraction

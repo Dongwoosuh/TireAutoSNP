@@ -18,7 +18,7 @@ def load_step(odb, step_name):
         sys.exit()
     return step
 
-def     slip_angle_dist_extraction(odb_name, instance_name):
+def slip_angle_dist_extraction(odb_name, instance_name):
     print("...Slip Angle and Distance Extraction...")
     
     try:
@@ -58,7 +58,7 @@ def     slip_angle_dist_extraction(odb_name, instance_name):
         print("Error: Could not find node with minimum Y in last frame.")
         odb.close()
         exit()
-
+        
     # inintial frame (index 0)
     initial_frame = step_bending.frames[0]
     displacement_field_initial = initial_frame.fieldOutputs['U'].getSubset(region=myInstance)
@@ -175,6 +175,8 @@ def     slip_angle_dist_extraction(odb_name, instance_name):
     angleslist_ec, _, _, _ = get_angle_per_frame(odb, step_subrotation, myInstance, node_c, node_e, contact_node=node_a)
     angle_differences = [abs(a[1] - b[1]) for a, b in zip(angleslist_ba, angleslist_ec)]
     print(angle_differences)
+    pdb.set_trace()
+    
     ######
     velocity_of_subrot = 4.63*2
     angleslist_ec = [math.degrees(velocity_of_subrot*time) for time in time_list]
@@ -361,7 +363,7 @@ def get_angle_per_frame(odb, step, myInstance, node_1, node_2, contact_node):
         initial_node_1_disp = node_1_initial_disp.dataDouble
         
     initial_node_1 = [myInstance.nodes[node_1 - 1].coordinates[i] + initial_node_1_disp[i] for i in range(3)]
-    
+    pdb.set_trace()
     # initial_node_2  = calculate_center_of_nodes(myInstance, node_2, first_displacement_field)
     try: 
         initial_node_2_disp = node_2_initial_disp.data
