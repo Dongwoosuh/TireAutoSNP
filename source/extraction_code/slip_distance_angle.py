@@ -81,16 +81,25 @@ def     slip_angle_dist_extraction(odb_name, instance_name):
         node_a_initial_z = min_y_node.coordinates[2] + node_a_initial_disp.dataDouble[2]
 
     # target point in the initial frame
-    target_point = (node_a_initial_x, node_a_initial_y + 30 , node_a_initial_z)
+    target_point_1 = (node_a_initial_x + 5, node_a_initial_y , node_a_initial_z)
+    target_point_2 = (node_a_initial_x + 5, node_a_initial_y + 30 , node_a_initial_z)
     
     # the node closest to the target point in the initial frame (Node B)
-    closest_node = find_closest_node(target_point, myInstance.nodes, displacement_values_initial)
-    if closest_node:
-        node_b = closest_node.label
-        node_b_info = closest_node
+    closest_node_1 = find_closest_node(target_point_1, myInstance.nodes, displacement_values_initial)
+    if closest_node_1:
+        node_a = closest_node_1.label
+        # node_a = closest_node_1
     else:
         print("Error: Could not find a node closest to the target point in initial frame.")
         
+    closest_node_2 = find_closest_node(target_point_2, myInstance.nodes, displacement_values_initial)
+    if closest_node_2:
+        node_b = closest_node_2.label
+        # node_b = closest_node_2
+    else:
+        print("Error: Could not find a node closest to the target point in initial frame.")
+        
+    # pdb.set_trace()
     # close_nodes_b, close_nodes_b_coords = find_nodes_within_tolerance(target_point, myInstance.nodes, displacement_values_initial)
     # node_b_coords = calculate_midpoint_by_nodes(close_nodes_b_coords)
     

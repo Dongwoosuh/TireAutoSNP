@@ -66,7 +66,7 @@ for odb_name in odb_files:
     contact_area_extraction(odb_name)
     target_contact_area = contact_area_mean_extraction(odb_name)
     
-    max_stress_extraction(odb_name, instance_name, target_step_frame_list)
+    # max_stress_extraction(odb_name, instance_name, target_step_frame_list)
 
     ## CSV output file
     odb_base_name = os.path.basename(odb_name).replace(".odb", "")
