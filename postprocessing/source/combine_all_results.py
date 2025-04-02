@@ -32,8 +32,23 @@ def combine_results():
             print(f"Error reading {file_name}: {e}")
 
     # 새 헤더 정의
-    columns = ["ODB Name", "Vertical Stiffness", "Max Slip Angle", "Max Slip Distance", "Bending Moment", "Torque", "Center Disp Gap(subrot)", "Center Disp Gap(rot)", "Total Center Disp Gap",
-            "Total Center Disp Std", "Max Velocity(subrot)", "Max Velocity(rot)", "Target Contact Area", "Subrot Stop Time", "Rot Stop Time", "Max Rot Contact Area"] 
+    columns = ["ODB Name",
+               "Vertical Stiffness", 
+               "Max Slip Angle", 
+               "Max Slip Distance",
+               "Bending Moment", 
+               "Torque",
+               "Torque_rot",
+               "Center Disp Gap(subrot)", 
+               "Center Disp Gap(rot)",
+               "Total Center Disp Gap",
+                "Total Center Disp Std",
+                "Max Velocity(subrot)",
+                "Max Velocity(rot)",
+                "Target Contact Area",
+                "Subrot Stop Time",
+                "Rot Stop Time",
+                "Max Rot Contact Area"] 
 
     # 마지막 행들을 데이터프레임으로 변환
     result_df = pd.DataFrame(last_rows, columns=columns)

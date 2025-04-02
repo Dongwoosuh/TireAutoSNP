@@ -19,7 +19,7 @@ for subfolder in required_subfolders:
 
         
 
-odb_folder_path = './omniwheel_ref'
+odb_folder_path = './omniwheel_ref/added'
 odb_files = [
     os.path.join(odb_folder_path, file)
     for file in os.listdir(odb_folder_path)
@@ -34,11 +34,12 @@ max_overall_stress_list = []
 # avg_vertical_stiffness_list = []
 # last_vertical_stiffness_list = []
 # initial_vertical_stiffness_list = []
-displacement_last_frame_list = []
+displacement_last_frame_list =  []
 max_slip_angle_list = []
 max_slip_distance_list = []
 bending_moment_list = []
 torque_list = []
+torque_rot_list = []
 subrot_center_disp_gap_list = []
 rot_center_disp_gap_list = []
 total_cetner_disp_gap_list = []
@@ -53,6 +54,7 @@ max_rot_carea_list = []
 for odb_name in odb_files:
     print("\n====================== Extracting data from {} ===========================".format(odb_name))
     
+    torque_last_frame, max_torque_subrot, max_torque_rot = torque_extraction(odb_name)
     max_slip_angle, subrot_stoptime, max_angle_index= slip_angle_extraction(odb_name, instance_name) # using last frame and first frame
     max_slip_distance, rot_stoptime , max_dist_idx= slip_distance_extraction(odb_name, instance_name) # using last frame and first frame
     # max_slip_angle, max_slip_distance, target_step_frame_list, subrot_stoptime, rot_stoptime, outlier_bool  = slip_angle_dist_extraction(odb_name, instance_name)
@@ -68,7 +70,6 @@ for odb_name in odb_files:
     target_contact_area_, max_rot_carea  = contact_area_extraction(odb_name)
     subrot_center_disp_gap, rot_center_disp_gap, total_ceter_disp_gap, total_center_disp_std, max_velocity_subrot, max_velocity_rot = tire_center_displacement_extraction(odb_name)
     bending_moment = bending_moment_extraction(odb_name)
-    torque_last_frame, max_torque = torque_extraction(odb_name)
     contact_area_extraction(odb_name)
     target_contact_area = contact_area_mean_extraction(odb_name)
     
@@ -84,6 +85,7 @@ for odb_name in odb_files:
     max_slip_distance_list.append(max_slip_distance)
     bending_moment_list.append(bending_moment)
     torque_list.append(torque_last_frame)
+    torque_rot_list.append(max_torque_rot)
     subrot_center_disp_gap_list.append(subrot_center_disp_gap)
     rot_center_disp_gap_list.append(rot_center_disp_gap)
     total_cetner_disp_gap_list.append(total_ceter_disp_gap)
@@ -105,6 +107,7 @@ for odb_name in odb_files:
                "Max Slip Distance",
                "Bending Moment",
                "Torque", 
+               "Torque_rot",
                "Center Disp Gap(subrot)", 
                "Center Disp Gap(rot)",
                "Total Center Disp Gap",
@@ -121,6 +124,7 @@ for odb_name in odb_files:
               max_slip_distance, 
               bending_moment, 
               torque_last_frame, 
+              max_torque_rot,
               subrot_center_disp_gap,
               rot_center_disp_gap, 
               total_ceter_disp_gap,
@@ -153,6 +157,7 @@ for odb_name in odb_files:
                         "Max Slip Distance",
                         "Bending Moment", 
                         "Torque", 
+                        "Torque_rot",
                         "Center Disp Gap(subrot)",
                         "Center Disp Gap(rot)",
                         "Total Center Disp Gap", 
@@ -173,6 +178,7 @@ for odb_name in odb_files:
                 max_slip_distance_list[i],
                 bending_moment_list[i],
                 torque_list[i],
+                torque_rot_list[i],
                 subrot_center_disp_gap_list[i],
                 rot_center_disp_gap_list[i],
                 total_cetner_disp_gap_list[i],

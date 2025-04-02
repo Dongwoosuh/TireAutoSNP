@@ -2,7 +2,7 @@
 import os
 import csv
 import numpy as np
-
+import pdb
 from odbAccess import *
 
 __all__ = ['torque_extraction']
@@ -49,5 +49,29 @@ def torque_extraction(odb_name):
         writer = csv.writer(file)
         writer.writerow(headers)
         writer.writerows(torque)
+        
+        
+    step2 = odb.steps['rotation']
+    
+    element_set_name2 = 'TIRE_CENTER_2'
+    element_set2 = odb.rootAssembly.nodeSets[element_set_name2]
+    assembly_element_label2 = element_set2.nodes[0][0].label
+    element_name2 = 'Node ASSEMBLY.{}'.format(assembly_element_label2)
+    
+    
+    try:
+        history_region2 = step2.historyRegions[element_name2]  # Node PartName.nodenum
+    except KeyError:
+        print("History region 'Element ASSEMBLY.2' not found in odb file: {}".format(odb_name))  
+    RM3 = history_region2.historyOutputs['RM3'].data
+    
+    RM3_list = []
+    for i in range(len(RM3)):
+        RM3_list.append(abs(RM3[i][1]))
+        
+    torque_2 = np.array(RM3_list)
 
-    return torque_last_frame, max_torque
+    max_torque2 = np.max(torque_2)
+    print("Max Torque2: {}\n".format(max_torque2))
+
+    return torque_last_frame, max_torque, max_torque2
