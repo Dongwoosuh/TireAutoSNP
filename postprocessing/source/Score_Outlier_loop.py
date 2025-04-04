@@ -38,7 +38,7 @@ def max_stress_after_outlier_removal():
         df = df.dropna().reset_index(drop=True)
 
         # 이상치 제거 함수 (상위 Z-Score 기반)
-        def remove_upper_outliers_zscore(data, threshold=5):
+        def remove_upper_outliers_zscore(data, threshold=10):
             z_scores = zscore(data)
             outliers = data[z_scores > threshold]  # 상위 이상치만 제거
             filtered_data = data[z_scores <= threshold]

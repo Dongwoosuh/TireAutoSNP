@@ -6,7 +6,7 @@ __all__ = ['filter_doe_results']
 def filter_doe_results():
     # 파일 경로 설정
     total_results_path = './results/Total_results_new.csv'
-    doe_results_path = './postprocessing/result/Total_sampling_DOE_0210.csv'
+    doe_results_path = './postprocessing/result/LHS_samples_0327_ModifyTire_120.csv'
 
     # 파일 읽기
     total_results = pd.read_csv(total_results_path)
