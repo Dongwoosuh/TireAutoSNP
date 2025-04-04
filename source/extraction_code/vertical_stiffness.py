@@ -52,6 +52,8 @@ def vertical_stiffness_extraction(odb_name, instance_name, graph_plot=False):
         odb.close()
         exit()
         
+    print("Node A: ", node_a)
+        
     # inintial frame (index 0)
     for i in range(len(step_loading.frames)):
         frame_data = step_loading.frames[i]

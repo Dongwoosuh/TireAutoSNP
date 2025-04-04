@@ -45,13 +45,13 @@ def max_stress_extraction(odb_name, instance_name, new_target_step_frame_list):
     for i in new_target_step_frame_list:
         if i[0] == 'subrotation':
             for j in range(len(subrotation_time)):
-                if subrotation_time[j] > i[1]:
+                if subrotation_time[j] >= i[1]:
                     subrotation_frame = j-1
                     break
                 
         elif i[0] == 'rotation':
             for j in range(len(rotation_time)):
-                if rotation_time[j] > i[1]:
+                if rotation_time[j] >= i[1]:
                     rotation_frame = j-1
                     break
                 

@@ -19,7 +19,7 @@ for subfolder in required_subfolders:
 
         
 
-odb_folder_path = './omniwheel_ref/added'
+odb_folder_path = './omniwheel_ref/Cluster'
 odb_files = [
     os.path.join(odb_folder_path, file)
     for file in os.listdir(odb_folder_path)
@@ -57,11 +57,6 @@ for odb_name in odb_files:
     torque_last_frame, max_torque_subrot, max_torque_rot = torque_extraction(odb_name)
     max_slip_angle, subrot_stoptime, max_angle_index= slip_angle_extraction(odb_name, instance_name) # using last frame and first frame
     max_slip_distance, rot_stoptime , max_dist_idx= slip_distance_extraction(odb_name, instance_name) # using last frame and first frame
-    # max_slip_angle, max_slip_distance, target_step_frame_list, subrot_stoptime, rot_stoptime, outlier_bool  = slip_angle_dist_extraction(odb_name, instance_name)
-    
-    # # do not save the data if outlier_bool is True
-    # if outlier_bool:
-    #     continue
     
     target_step_frame_list = [['subrotation', subrot_stoptime], ['rotation', rot_stoptime]]
     max_stress_extraction(odb_name, instance_name, target_step_frame_list)
