@@ -30,20 +30,19 @@ def vertical_stiffness_extraction(odb_name, instance_name, graph_plot=False):
         print("Error: No instance")
         odb.close()
         exit()
-        
+    
+    step_bending = odb.steps['bending'] 
     step_loading = odb.steps['loading'] 
     step_loading_300 = odb.steps['loading_300N'] 
-    step_bending = odb.steps['bending']
     
-    len_frames = len(step_bending.frames)
-    last_frame = step_bending.frames[len_frames -1]
+    # len_frames = len(step_loading.frames)
+    first_frame = step_bending.frames[0]
     
-    displacement_field_last = last_frame.fieldOutputs['U'].getSubset(region=myInstance)
+    displacement_field_first = first_frame.fieldOutputs['U'].getSubset(region=myInstance)
 
-    displacement_values_last = {value.nodeLabel: value for value in displacement_field_last.values}
-
+    displacement_values_first = {value.nodeLabel: value for value in displacement_field_first.values}
     # the node with the minimum Y coordinate in the last frame (Node A)
-    min_y_node = find_node_with_min_y(myInstance.nodes, displacement_values_last)
+    min_y_node = find_node_with_min_y(myInstance.nodes, displacement_values_first)
     if min_y_node:
         node_a = min_y_node.label
 
@@ -65,6 +64,8 @@ def vertical_stiffness_extraction(odb_name, instance_name, graph_plot=False):
         node_a_coord_y = min_y_node.coordinates[1] + node_a_disp.data[1]
         node_a_coord_z = min_y_node.coordinates[2] + node_a_disp.data[2]
         
+        if i == 0 :
+            initial_a_y = node_a_coord_y
         if node_a_coord_y < -79.99:
             inintial_time = frame_data.frameValue
             inintial_frame = frame_data
@@ -77,7 +78,6 @@ def vertical_stiffness_extraction(odb_name, instance_name, graph_plot=False):
     assembly_node_label = supporter_node_set.nodes[0][0].label
     # print("Node labels: ", assembly_node_label)
     node_name = 'Node ASSEMBLY.{}'.format(assembly_node_label)
-    
     try:
         history_region_loading = step_loading.historyRegions[node_name]  # Node PartName.nodenum
     except KeyError:
@@ -92,7 +92,6 @@ def vertical_stiffness_extraction(odb_name, instance_name, graph_plot=False):
     for time, tire_center_displacement in displacement_history_U_loading:
         time_graph_loading.append(time)
         tire_center_displacement_graph.append(tire_center_displacement)
-        
         if round(time, 4) == round(inintial_time, 4):
             initial_u2 = tire_center_displacement_graph[idx]
             # print("Initial U2: ", initial_u2)
@@ -152,13 +151,12 @@ def vertical_stiffness_extraction(odb_name, instance_name, graph_plot=False):
     
         
     # average_stiffness = sttiffness_sum / (len(stiffness_graph))
-
     
+    initial_u2 = -80 - initial_a_y
+    # pdb.set_trace()
     # last_frame_timestep = time_graph[-1] - time_graph[-2]
     displacement_gap = displacement_loading_300_graph[-1] - initial_u2
-
-    last_frame_stiffness = abs(force_ori / displacement_gap)  
-
+    last_frame_stiffness = abs(force_ori / displacement_gap) 
     # initial_frame_stiffness = stiffness_graph[0]
     # print("Avg Vertical stiffness: {}\n".format(average_stiffness))
     # print("Last Frame Vertical stiffness: {}\n".format(last_frame_stiffness))
