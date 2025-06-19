@@ -48,7 +48,8 @@ def combine_results():
                 "Target Contact Area",
                 "Subrot Stop Time",
                 "Rot Stop Time",
-                "Max Rot Contact Area"] 
+                "Max Rot Contact Area"
+                ] 
 
     # 마지막 행들을 데이터프레임으로 변환
     result_df = pd.DataFrame(last_rows, columns=columns)
