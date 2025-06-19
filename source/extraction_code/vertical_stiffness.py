@@ -36,7 +36,7 @@ def vertical_stiffness_extraction(odb_name, instance_name, graph_plot=False):
     step_loading_300 = odb.steps['loading_300N'] 
     
     # len_frames = len(step_loading.frames)
-    first_frame = step_bending.frames[0]
+    first_frame = step_bending.frames[-1]
     
     displacement_field_first = first_frame.fieldOutputs['U'].getSubset(region=myInstance)
 
