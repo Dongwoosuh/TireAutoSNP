@@ -44,7 +44,7 @@ def slip_angle_extraction(odb_name, instance_name):
     L1_U3_subrot = history_region_subrotation.historyOutputs['U3'].data  # 'U2' 기입
     
     
-    velocity_of_subrot = 4.63*2
+    velocity_of_subrot = 4.63*2  
     
     L1_U3_subrot_list = []
     subrot_ori_dist_list = []
@@ -102,10 +102,13 @@ def slip_distance_extraction(odb_name, instance_name):
         
     tire_u3_rot = history_region_rotation.historyOutputs['U1'].data  # 'U2' 기입
 
+    # Check if analysis ran up to 3.9s
+    if not tire_u3_rot or tire_u3_rot[-1][0] < 0.04:
+        error_msg = "Error: ODB {} only ran up to {:.2f}s, expected at least 3.9s.".format(odb_name, tire_u3_rot[-1][0] if tire_u3_rot else 0.0)
+        print(error_msg)
+        raise Exception(error_msg)
     
     velocity_of_rot = 5.56*2
-    
-    
     
     center_U1_rot_list = []
     rot_ori_distance_list = []
@@ -114,6 +117,9 @@ def slip_distance_extraction(odb_name, instance_name):
     prev_rot_gap = None
     
     for idx, (time, value) in enumerate(tire_u3_rot):
+        if time > 0.04:
+            break
+
         center_U1_rot_list.append(value)
         rot_time_list.append(time)
         

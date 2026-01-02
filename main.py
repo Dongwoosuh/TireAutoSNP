@@ -2,6 +2,7 @@ from source.extraction_code import *
 import os
 import csv
 import pdb
+import traceback
 
 results_folder = './results'
 if not os.path.exists(results_folder):
@@ -55,94 +56,111 @@ max_rot_carea_list = []
 for odb_name in odb_files:
     print("\n====================== Extracting data from {} ===========================".format(odb_name))
     
-    displacement_last_frame = vertical_stiffness_extraction(odb_name, instance_name) # using last frame and first frame
-    torque_last_frame, max_torque_subrot, max_torque_rot = torque_extraction(odb_name)
-    max_slip_angle, subrot_stoptime, max_angle_index= slip_angle_extraction(odb_name, instance_name) # using last frame and first frame
-    max_slip_distance, rot_stoptime , max_dist_idx= slip_distance_extraction(odb_name, instance_name) # using last frame and first frame
-    
-    target_step_frame_list = [['subrotation', subrot_stoptime], ['rotation', rot_stoptime]]
-    # max_stress_extraction(odb_name, instance_name, target_step_frame_list)
-    # max_LE_extraction(odb_name, instance_name, target_step_frame_list)
-    max_stress_and_LE_extraction(odb_name, instance_name, target_step_frame_list)
-    
-    bending_moment = bending_moment_extraction(odb_name)
-    target_contact_area = contact_area_mean_extraction(odb_name)
-    
-    # target_contact_area_, max_rot_carea  = contact_area_extraction(odb_name)
-    # subrot_center_disp_gap, rot_center_disp_gap, total_ceter_disp_gap, total_center_disp_std, max_velocity_subrot, max_velocity_rot = tire_center_displacement_extraction(odb_name)
-    # contact_area_extraction(odb_name)
-    
+    try:
+        displacement_last_frame = vertical_stiffness_extraction(odb_name, instance_name) # using last frame and first frame
+        torque_last_frame, max_torque_subrot, max_torque_rot = torque_extraction(odb_name)
+        max_slip_angle, subrot_stoptime, max_angle_index= slip_angle_extraction(odb_name, instance_name) # using last frame and first frame
+        max_slip_distance, rot_stoptime , max_dist_idx= slip_distance_extraction(odb_name, instance_name) # using last frame and first frame
+        
+        target_step_frame_list = [['subrotation', subrot_stoptime], ['rotation', rot_stoptime]]
+        # max_stress_extraction(odb_name, instance_name, target_step_frame_list)
+        # max_LE_extraction(odb_name, instance_name, target_step_frame_list)
+        max_stress_and_LE_extraction(odb_name, instance_name, target_step_frame_list)
+        
+        bending_moment = bending_moment_extraction(odb_name)
+        target_contact_area = contact_area_mean_extraction(odb_name)
+        
+        # target_contact_area_, max_rot_carea  = contact_area_extraction(odb_name)
+        # subrot_center_disp_gap, rot_center_disp_gap, total_ceter_disp_gap, total_center_disp_std, max_velocity_subrot, max_velocity_rot = tire_center_displacement_extraction(odb_name)
+        # contact_area_extraction(odb_name)
+        
 
-    ## CSV output file
-    odb_base_name = os.path.basename(odb_name).replace(".odb", "")
-    odb_name_list.append(odb_base_name)
-    
-    
-    target_contact_area_list.append(target_contact_area)    
-    displacement_last_frame_list.append(displacement_last_frame)
-    max_slip_angle_list.append(max_slip_angle)
-    max_slip_distance_list.append(max_slip_distance)
-    bending_moment_list.append(bending_moment)
-    # torque_list.append(torque_last_frame)
-    # torque_rot_list.append(max_torque_rot)
-    # subrot_center_disp_gap_list.append(subrot_center_disp_gap)
-    # rot_center_disp_gap_list.append(rot_center_disp_gap)
-    # total_cetner_disp_gap_list.append(total_ceter_disp_gap)
-    # total_center_disp_std_list.append(total_center_disp_std)
-    # max_velocity_subrot_list.append(max_velocity_subrot)
-    # max_velocity_rot_list.append(max_velocity_rot)
-    # subrot_stoptime_list.append(subrot_stoptime)
-    # rot_stoptime_list.append(rot_stoptime)
-    # max_rot_carea_list.append(max_rot_carea)
-    
-    
-    # write csv for sungneung yoso
-    odb_base_name = os.path.basename(odb_name).replace(".odb", "")
-    csv_file_name = os.path.basename(odb_name).replace(".odb", ".csv")
-    csv_file_name = os.path.join('results','Total_results', csv_file_name)
-    headers = ["ODB Name", 
-               "Vertical Stiffness",
-               "Max Slip Angle",
-               "Max Slip Distance",
-               "Bending Moment",
-            #    "Torque", 
-            #    "Torque_rot",
-            #    "Center Disp Gap(subrot)", 
-            #    "Center Disp Gap(rot)",
-            #    "Total Center Disp Gap",
-            #    "Total Center Disp Std",
-            #    "Max Velocity(subrot)",
-            #    "Max Velocity(rot)", 
-               "Target Contact Area",
-            #    "Subrot Stop Time",
-            #    "Rot Stop Time",
-            #    "Max Rot Contact Area"
-               ] 
-    values = [odb_base_name, 
-              displacement_last_frame,
-              max_slip_angle, 
-              max_slip_distance, 
-              bending_moment, 
-            #   torque_last_frame, 
-            #   max_torque_rot,
-            #   subrot_center_disp_gap,
-            #   rot_center_disp_gap, 
-            #   total_ceter_disp_gap,
-            #   total_center_disp_std,
-            #   max_velocity_subrot,
-            #   max_velocity_rot, 
-              target_contact_area,
-            #   subrot_stoptime, 
-            #   rot_stoptime, 
-            #   max_rot_carea
-              ]
+        ## CSV output file
+        odb_base_name = os.path.basename(odb_name).replace(".odb", "")
+        odb_name_list.append(odb_base_name)
+        
+        
+        target_contact_area_list.append(target_contact_area)    
+        displacement_last_frame_list.append(displacement_last_frame)
+        max_slip_angle_list.append(max_slip_angle)
+        max_slip_distance_list.append(max_slip_distance)
+        bending_moment_list.append(bending_moment)
+        # torque_list.append(torque_last_frame)
+        # torque_rot_list.append(max_torque_rot)
+        # subrot_center_disp_gap_list.append(subrot_center_disp_gap)
+        # rot_center_disp_gap_list.append(rot_center_disp_gap)
+        # total_cetner_disp_gap_list.append(total_ceter_disp_gap)
+        # total_center_disp_std_list.append(total_center_disp_std)
+        # max_velocity_subrot_list.append(max_velocity_subrot)
+        # max_velocity_rot_list.append(max_velocity_rot)
+        # subrot_stoptime_list.append(subrot_stoptime)
+        # rot_stoptime_list.append(rot_stoptime)
+        # max_rot_carea_list.append(max_rot_carea)
+        
+        
+        # write csv for sungneung yoso
+        odb_base_name = os.path.basename(odb_name).replace(".odb", "")
+        csv_file_name = os.path.basename(odb_name).replace(".odb", ".csv")
+        csv_file_name = os.path.join('results','Total_results', csv_file_name)
+        headers = ["ODB Name", 
+                "Vertical Stiffness",
+                "Max Slip Angle",
+                "Max Slip Distance",
+                "Bending Moment",
+                #    "Torque", 
+                #    "Torque_rot",
+                #    "Center Disp Gap(subrot)", 
+                #    "Center Disp Gap(rot)",
+                #    "Total Center Disp Gap",
+                #    "Total Center Disp Std",
+                #    "Max Velocity(subrot)",
+                #    "Max Velocity(rot)", 
+                "Target Contact Area",
+                #    "Subrot Stop Time",
+                #    "Rot Stop Time",
+                #    "Max Rot Contact Area"
+                ] 
+        values = [odb_base_name, 
+                displacement_last_frame,
+                max_slip_angle, 
+                max_slip_distance, 
+                bending_moment, 
+                #   torque_last_frame, 
+                #   max_torque_rot,
+                #   subrot_center_disp_gap,
+                #   rot_center_disp_gap, 
+                #   total_ceter_disp_gap,
+                #   total_center_disp_std,
+                #   max_velocity_subrot,
+                #   max_velocity_rot, 
+                target_contact_area,
+                #   subrot_stoptime, 
+                #   rot_stoptime, 
+                #   max_rot_carea
+                ]
 
-    with open(csv_file_name, 'wb') as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow(headers)
-        writer.writerow(values)
+        with open(csv_file_name, 'wb') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(headers)
+            writer.writerow(values)
 
-    print("======================== Data extraction and file creation completed. ===========================\n")
+        print("======================== Data extraction and file creation completed. ===========================\n")
+    except Exception as e:
+        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        print("Error processing {}: {}".format(odb_name, e))
+        traceback.print_exc()
+        
+        # Log error to file
+        with open("error_log.txt", "a") as log_file:
+            log_file.write("===============================================================\n")
+            log_file.write("Error processing {}:\n".format(odb_name))
+            log_file.write(str(e) + "\n")
+            traceback.print_exc(file=log_file)
+            log_file.write("===============================================================\n\n")
+
+        print("Skipping to next ODB...")
+        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        continue
 
     
 
