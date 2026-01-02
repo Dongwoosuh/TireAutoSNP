@@ -60,9 +60,14 @@ def vertical_stiffness_extraction(odb_name, instance_name, graph_plot=False):
         displacement_values = {value.nodeLabel: value for value in displacement_field.values}
         node_a_disp = displacement_values.get(node_a)
         
-        node_a_coord_x = min_y_node.coordinates[0] + node_a_disp.data[0]
-        node_a_coord_y = min_y_node.coordinates[1] + node_a_disp.data[1]
-        node_a_coord_z = min_y_node.coordinates[2] + node_a_disp.data[2]
+        try:
+            node_a_coord_x = min_y_node.coordinates[0] + node_a_disp.data[0]
+            node_a_coord_y = min_y_node.coordinates[1] + node_a_disp.data[1]
+            node_a_coord_z = min_y_node.coordinates[2] + node_a_disp.data[2]
+        except OdbError:
+            node_a_coord_x = min_y_node.coordinates[0] + node_a_disp.dataDouble[0]
+            node_a_coord_y = min_y_node.coordinates[1] + node_a_disp.dataDouble[1]
+            node_a_coord_z = min_y_node.coordinates[2] + node_a_disp.dataDouble[2]
         
         if i == 0 :
             initial_a_y = node_a_coord_y
@@ -94,7 +99,7 @@ def vertical_stiffness_extraction(odb_name, instance_name, graph_plot=False):
         tire_center_displacement_graph.append(tire_center_displacement)
         if round(time, 4) == round(inintial_time, 4):
             initial_u2 = tire_center_displacement_graph[idx]
-            # print("Initial U2: ", initial_u2)
+            print("Initial U2: ", initial_u2)
             break
         else:
             idx += 1

@@ -58,8 +58,8 @@ def slip_angle_extraction(odb_name, instance_name):
         
         subrot_original_distance = velocity_of_subrot * time
         subrot_ori_dist_list.append(subrot_original_distance)
-        # subrot_gap = math.degrees(abs(value/30 - subrot_original_distance))
-        subrot_gap = abs(value - subrot_original_distance*30)
+        subrot_gap = math.degrees(abs(value/30 - subrot_original_distance))
+        # subrot_gap = abs(value - subrot_original_distance*30)
         subrot_gap_list.append(subrot_gap)
 
         if prev_subrot_gap is not None and subrot_gap < prev_subrot_gap:
@@ -121,12 +121,14 @@ def slip_distance_extraction(odb_name, instance_name):
         rot_ori_distance_list.append(rot_original_distance)
         rot_gap = abs(value - rot_original_distance)
         rot_gap_list.append(rot_gap)
-
         if prev_rot_gap is not None and rot_gap < prev_rot_gap:
             break
 
         prev_rot_gap = rot_gap
     
+    print("Rot_original distance: ", rot_ori_distance_list)
+    print("center_U1_rot_list: ", center_U1_rot_list)
+    print("Rotation gap: ", rot_gap_list)
     max_dist_difference = max(rot_gap_list)
     max_dist_index = rot_gap_list.index(max_dist_difference)    
     rot_stop_time = rot_time_list[max_dist_index]

@@ -21,14 +21,14 @@ def find_node_with_min_y(nodes, displacement_values):
             x = node.coordinates[0] + disp.dataDouble[0]
             y = node.coordinates[1] + disp.dataDouble[1]
         
-        if x > 45 : 
+        if x > 90 : 
+        # if x > 45 : 
             if y < min_y:
                 min_y = y
                 min_y_node = node
                 
         else: 
             continue
-    pdb.set_trace()
     return min_y_node
 
 

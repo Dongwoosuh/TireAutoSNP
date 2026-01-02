@@ -37,18 +37,18 @@ def combine_results():
                "Max Slip Angle", 
                "Max Slip Distance",
                "Bending Moment", 
-               "Torque",
-               "Torque_rot",
-               "Center Disp Gap(subrot)", 
-               "Center Disp Gap(rot)",
-               "Total Center Disp Gap",
-                "Total Center Disp Std",
-                "Max Velocity(subrot)",
-                "Max Velocity(rot)",
+            #    "Torque",
+            #    "Torque_rot",
+            #    "Center Disp Gap(subrot)", 
+            #    "Center Disp Gap(rot)",
+            #    "Total Center Disp Gap",
+            #     "Total Center Disp Std",
+            #     "Max Velocity(subrot)",
+            #     "Max Velocity(rot)",
                 "Target Contact Area",
-                "Subrot Stop Time",
-                "Rot Stop Time",
-                "Max Rot Contact Area"
+                # "Subrot Stop Time",
+                # "Rot Stop Time",
+                # "Max Rot Contact Area"
                 ] 
 
     # 마지막 행들을 데이터프레임으로 변환
