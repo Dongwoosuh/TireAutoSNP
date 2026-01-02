@@ -7,7 +7,7 @@ results_folder = './results'
 if not os.path.exists(results_folder):
     os.makedirs(results_folder)
 
-required_subfolders = ['CAREA', 'Stress_all', 'Tire_center', 'Torque', 'Total_results']
+required_subfolders = ['CAREA', 'Stress_all', 'LE_all', 'Tire_center', 'Torque', 'Total_results']
 
 for subfolder in required_subfolders:
     subfolder_path = os.path.join(results_folder, subfolder)
@@ -61,7 +61,9 @@ for odb_name in odb_files:
     max_slip_distance, rot_stoptime , max_dist_idx= slip_distance_extraction(odb_name, instance_name) # using last frame and first frame
     
     target_step_frame_list = [['subrotation', subrot_stoptime], ['rotation', rot_stoptime]]
-    max_stress_extraction(odb_name, instance_name, target_step_frame_list)
+    # max_stress_extraction(odb_name, instance_name, target_step_frame_list)
+    # max_LE_extraction(odb_name, instance_name, target_step_frame_list)
+    max_stress_and_LE_extraction(odb_name, instance_name, target_step_frame_list)
     
     bending_moment = bending_moment_extraction(odb_name)
     target_contact_area = contact_area_mean_extraction(odb_name)
