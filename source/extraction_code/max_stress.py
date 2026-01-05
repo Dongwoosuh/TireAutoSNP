@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*- 
 import os
 import csv
+import sys
 import pdb
 from odbAccess import *
 
@@ -115,7 +116,14 @@ def max_stress_extraction(odb_name, instance_name, new_target_step_frame_list):
                             
     all_element_labels  = sorted(all_elements_label)
     
-    with open(csv_path_name, 'w') as f:
+    if sys.version_info[0] < 3:
+        mode = 'wb'
+        kwargs = {}
+    else:
+        mode = 'w'
+        kwargs = {'newline': ''}
+
+    with open(csv_path_name, mode, **kwargs) as f:
         writer = csv.writer(f, lineterminator='\n')
 
         # 헤더: Step, Frame, 그리고 모든 Element Label

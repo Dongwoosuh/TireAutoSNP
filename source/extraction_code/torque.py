@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*- 
 import os
 import csv
+import sys
 import numpy as np
 import pdb
 from odbAccess import *
@@ -45,7 +46,15 @@ def torque_extraction(odb_name):
     csv_path_name = os.path.join(results_dir, csv_file_name)
 
     headers = ["Time", "Torque"]
-    with open(csv_path_name, 'wb') as file:
+
+    if sys.version_info[0] < 3:
+        mode = 'wb'
+        kwargs = {}
+    else:
+        mode = 'w'
+        kwargs = {'newline': ''}
+
+    with open(csv_path_name, mode, **kwargs) as file:
         writer = csv.writer(file)
         writer.writerow(headers)
         writer.writerows(torque)
@@ -67,6 +76,8 @@ def torque_extraction(odb_name):
     
     RM3_list = []
     for i in range(len(RM3)):
+        if RM3[i][0] > 0.04:
+            break
         RM3_list.append(abs(RM3[i][1]))
         
     torque_2 = np.array(RM3_list)

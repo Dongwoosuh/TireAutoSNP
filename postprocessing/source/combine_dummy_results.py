@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-_all_ = ['combine_max_stress']
+_all_ = ['combine_max_stress', 'combine_max_le']
 
 def combine_max_stress():
     # CSV 파일 불러오기
@@ -27,6 +27,30 @@ def combine_max_stress():
     # 변경된 데이터를 저장 (필요 시)
     results_pd.to_csv('./results/Total_results_new.csv', index=False)
     
+def combine_max_le():
+    # CSV 파일 불러오기
+    max_le_pd = pd.read_csv('./results/Max_LE_After_Outlier_Removal.csv')
+    results_pd = pd.read_csv('./results/Total_results_new.csv')
+
+    # 컬럼명 확인 후 공백 제거
+    max_le_pd.columns = max_le_pd.columns.str.strip()
+    results_pd.columns = results_pd.columns.str.strip()
+
+    # 'Max LE' 컬럼이 없으면 새로 생성 (기본값 NaN)
+    if 'Max LE' not in results_pd.columns:
+        results_pd['Max LE'] = np.nan
+
+    # 'ODB Name'을 기준으로 'Max LE After Outlier Removal' 값을 results_pd의 'Max LE' 컬럼에 추가
+    results_pd['Max LE'] = results_pd['ODB Name'].map(
+        max_le_pd.set_index('File Name')['Max LE After Outlier Removal']
+    )
+
+    # 결과 확인
+    print(results_pd)
+
+    # 변경된 데이터를 저장 (필요 시)
+    results_pd.to_csv('./results/Total_results_new.csv', index=False)
+
 def combine_max_velocity():
     # CSV 파일 불러오기
     max_stress_pd = pd.read_csv('./results/Total_Max_velocity.csv')
@@ -85,5 +109,6 @@ def combine_target_carea():
 
 if __name__ == '__main__':
     combine_max_stress()
+    combine_max_le()
     # combine_max_velocity()
     # combine_target_carea()

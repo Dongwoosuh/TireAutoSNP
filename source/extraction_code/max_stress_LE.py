@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*- 
 import os
 import csv
+import sys
 import pdb
 from odbAccess import *
 
@@ -95,13 +96,20 @@ def max_stress_and_LE_extraction(odb_name, instance_name, new_target_step_frame_
             
         # Process LE
         for le in le_value:
-            le_steps_data[step_key][le.elementLabel] = le.mises
+            le_steps_data[step_key][le.elementLabel] = le.maxPrincipal
             all_elements_label.add(le.elementLabel)
                             
     all_element_labels  = sorted(all_elements_label)
     
+    if sys.version_info[0] < 3:
+        mode = 'wb'
+        kwargs = {}
+    else:
+        mode = 'w'
+        kwargs = {'newline': ''}
+
     # Write Stress CSV
-    with open(stress_csv_path, 'w') as f:
+    with open(stress_csv_path, mode, **kwargs) as f:
         writer = csv.writer(f, lineterminator='\n')
         header = ['ElementLabel']
         for step_name, frame_num in target_step_frame:
@@ -117,7 +125,7 @@ def max_stress_and_LE_extraction(odb_name, instance_name, new_target_step_frame_
             writer.writerow(row)
             
     # Write LE CSV
-    with open(le_csv_path, 'w') as f:
+    with open(le_csv_path, mode, **kwargs) as f:
         writer = csv.writer(f, lineterminator='\n')
         header = ['ElementLabel']
         for step_name, frame_num in target_step_frame:

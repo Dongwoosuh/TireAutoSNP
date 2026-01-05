@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*- 
 import os
 import csv
+import sys
 import pdb
 from odbAccess import *
 
@@ -13,7 +14,15 @@ def contact_area_mean_extraction(odb_name):
     odb_base_name = os.path.basename(odb_name).replace(".odb", "")
     csv_file_name = os.path.basename(odb_name).replace(".odb", ".csv")
     csv_path_name = os.path.join('results','CAREA', csv_file_name)
-    with open(csv_path_name, 'w') as csvfile:
+
+    if sys.version_info[0] < 3:
+        mode = 'wb'
+        kwargs = {}
+    else:
+        mode = 'w'
+        kwargs = {'newline': ''}
+
+    with open(csv_path_name, mode, **kwargs) as csvfile:
         csvwriter = csv.writer(csvfile, lineterminator='\n')
         csvwriter.writerow(['Step', 'Time', 'CAREA'])
 
@@ -61,6 +70,8 @@ def contact_area_mean_extraction(odb_name):
 
             if carea_data:
                 for time, area in carea_data:
+                        if step_name == 'rotation' and time > 0.04:
+                            break
                         csvwriter.writerow([step_name,'{:.6f}'.format(time), '{:.6f}'.format(area)])   
             else:
                 print("No CAREA data found for step: {}".format(step_name))

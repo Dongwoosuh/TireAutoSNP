@@ -2,6 +2,7 @@
 import numpy as np
 import os
 import csv
+import sys
 import pdb
 from odbAccess import *
 
@@ -81,7 +82,7 @@ def tire_center_displacement_extraction(odb_name):
     else:
         for time_rot, displacement_rot in displacement_history_U_rotation:
             
-            if time_rot > 0.0762:
+            if time_rot > 0.04:
                 break
             time_graph_rot.append(time_rot)
             time_graph_total.append(time_rot + time_rot_start)
@@ -115,8 +116,15 @@ def tire_center_displacement_extraction(odb_name):
     odb_base_name = os.path.basename(odb_name).replace(".odb", "")
     csv_file_name = os.path.basename(odb_name).replace(".odb", ".csv")
     csv_path_name = os.path.join('results','Tire_center', csv_file_name)
+
+    if sys.version_info[0] < 3:
+        mode = 'wb'
+        kwargs = {}
+    else:
+        mode = 'w'
+        kwargs = {'newline': ''}
         
-    with open(csv_path_name, 'w') as csvfile:
+    with open(csv_path_name, mode, **kwargs) as csvfile:
         writer = csv.writer(csvfile, lineterminator='\n')
         writer.writerow(['Time', 'Total Displacement', 'Velocity'])
         for i in range(len(velocity_graph_total)):

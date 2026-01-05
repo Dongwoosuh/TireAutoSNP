@@ -555,7 +555,7 @@ def get_slip_dist_with_tire_center(odb, step, myInstance, node_1):
             current_node_1[1]
             stop_time = new_frame.frameValue
 
-        if new_frame.frameValue > 0.035:
+        if new_frame.frameValue > 0.04:
             break
     
     ori_angle_differences = [diff_angle for frame_value, curr_angle_ba, true_current_angle, diff_angle in angle_differences]   
