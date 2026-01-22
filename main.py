@@ -1,6 +1,7 @@
 from source.extraction_code import *
 import os
 import csv
+import sys
 import pdb
 import traceback
 
@@ -20,7 +21,7 @@ for subfolder in required_subfolders:
 
         
 
-odb_folder_path = r'E:\tire_run\251215\results_1'
+odb_folder_path = r'E:\Dongwoo\TeamWork\Hyunday_omni_wheels\TireAutoSNP\omniwheel_ref\260114'
 # odb_folder_path = './omniwheel_ref'
 odb_files = [
     os.path.join(odb_folder_path, file)
@@ -139,7 +140,15 @@ for odb_name in odb_files:
                 #   max_rot_carea
                 ]
 
-        with open(csv_file_name, 'wb') as csvfile:
+        import sys
+        if sys.version_info[0] < 3:
+            mode = 'wb'
+            kwargs = {}
+        else:
+            mode = 'w'
+            kwargs = {'newline': ''}
+
+        with open(csv_file_name, mode, **kwargs) as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(headers)
             writer.writerow(values)
@@ -165,7 +174,15 @@ for odb_name in odb_files:
     
 
     Total_results_file = os.path.join('results', 'Total_results_all.csv')
-    with open(Total_results_file, "wb") as csvfile:
+
+    if sys.version_info[0] < 3:
+        mode = 'wb'
+        kwargs = {}
+    else:
+        mode = 'w'
+        kwargs = {'newline': ''}
+
+    with open(Total_results_file, mode, **kwargs) as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(["ODB Name",
                         "Vertical Stiffness",

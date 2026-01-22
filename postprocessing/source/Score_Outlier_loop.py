@@ -21,7 +21,7 @@ def max_stress_after_outlier_removal():
     )
 
     # Z-Score 임계값 설정
-    threshold_z = 10
+    threshold_z = 6
 
     # 결과 저장용 리스트
     results = []
@@ -52,7 +52,7 @@ def max_stress_after_outlier_removal():
         min_outliers = {}  # 제거된 값 중 최소값
 
         for frame in df.columns[1:]:  # 첫 번째 컬럼(Element)을 제외한 나머지 프레임 데이터 처리
-            filtered_values, outliers = remove_upper_outliers_zscore(df[frame])
+            filtered_values, outliers = remove_upper_outliers_zscore(df[frame], threshold=threshold_z)
             filtered_df[frame] = filtered_values
             outliers_dict[frame] = outliers
             outlier_counts[frame] = len(outliers.dropna())
@@ -98,7 +98,7 @@ def max_LE_after_outlier_removal():
     )
 
     # Z-Score 임계값 설정
-    threshold_z = 10
+    threshold_z = 6
 
     # 결과 저장용 리스트
     results = []
@@ -129,7 +129,7 @@ def max_LE_after_outlier_removal():
         min_outliers = {}  # 제거된 값 중 최소값
 
         for frame in df.columns[1:]:  # 첫 번째 컬럼(Element)을 제외한 나머지 프레임 데이터 처리
-            filtered_values, outliers = remove_upper_outliers_zscore(df[frame])
+            filtered_values, outliers = remove_upper_outliers_zscore(df[frame], threshold=threshold_z)
             filtered_df[frame] = filtered_values
             outliers_dict[frame] = outliers
             outlier_counts[frame] = len(outliers.dropna())
